@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
 
 // Sets default values
@@ -104,16 +105,30 @@ void AShooterCharacter::FireWeapon()
 		const FQuat Rotation { SocketTransform.GetRotation() };
 		const FVector RotationAxis { Rotation.GetAxisX() };
 		const FVector End { Start + RotationAxis * 50'000.f };
+
+		FVector BeamEndPoint { End };
+		
 		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECC_Visibility);
 
 		if(FireHit.bBlockingHit)
 		{
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-			DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 5.f);
+			// DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+			// DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 5.f);
+
+			BeamEndPoint = FireHit.Location;
 
 			if (ImpactParticles)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
+			}
+		}
+
+		if (BeamParticles)
+		{
+			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
+			if (Beam)
+			{
+				Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
 			}
 		}
 	}

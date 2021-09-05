@@ -76,7 +76,10 @@ private:
 	/** Particles spawned upon bullet impact */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	UParticleSystem* ImpactParticles;
-	
+
+	/** Smoke trail for the bullet */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UParticleSystem* BeamParticles;
 public:
 
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
