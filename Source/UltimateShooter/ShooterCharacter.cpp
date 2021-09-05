@@ -108,9 +108,13 @@ void AShooterCharacter::FireWeapon()
 
 		if(FireHit.bBlockingHit)
 		{
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.f);
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
 			DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 5.f);
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *FireHit.Actor->GetName());	
+
+			if (ImpactParticles)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
+			}
 		}
 	}
 
