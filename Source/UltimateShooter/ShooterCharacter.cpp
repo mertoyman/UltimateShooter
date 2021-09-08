@@ -17,7 +17,7 @@ AShooterCharacter::AShooterCharacter() :
 	BaseTurnRate(45.f),
 	BaseLookUpRate(45.f)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -45,7 +45,7 @@ AShooterCharacter::AShooterCharacter() :
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void AShooterCharacter::MoveForward(float Value)
@@ -53,10 +53,10 @@ void AShooterCharacter::MoveForward(float Value)
 	if (Controller && Value != 0.f)
 	{
 		//find out which way is forward
-		const FRotator Rotation { Controller->GetControlRotation() };
-		const FRotator YawRotation { 0, Rotation.Yaw, 0 };
-		
-		const FVector Direction { FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
+		const FRotator Rotation{ Controller->GetControlRotation() };
+		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
+
+		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -64,11 +64,11 @@ void AShooterCharacter::MoveForward(float Value)
 void AShooterCharacter::MoveRight(float Value)
 {
 	//find out which way is right
-	const FRotator Rotation { Controller->GetControlRotation() };
-	const FRotator YawRotation { 0, Rotation.Yaw, 0 };
+	const FRotator Rotation{ Controller->GetControlRotation() };
+	const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
 
-	const FVector Direction { FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y) };
-	
+	const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y) };
+
 	AddMovementInput(Direction, Value);
 }
 
@@ -86,7 +86,7 @@ void AShooterCharacter::LookUpAtRate(float Rate)
 
 void AShooterCharacter::FireWeapon()
 {
-	if(FireSound)
+	if (FireSound)
 	{
 		UGameplayStatics::PlaySound2D(this, FireSound);
 	}
@@ -98,11 +98,8 @@ void AShooterCharacter::FireWeapon()
 
 		if (MuzzleFlash)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);	
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
-
-<<<<<<< Updated upstream
-=======
 
 		//Get current size of viewport
 		FVector2D ViewportSize;
@@ -126,9 +123,9 @@ void AShooterCharacter::FireWeapon()
 		if (bScreenToWorld) //was deprojection successful?
 		{
 			FHitResult ScreenTraceHit;
-			const FVector Start { CrosshairWorldPosition };
-			const FVector End { CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f }; 
-			
+			const FVector Start{ CrosshairWorldPosition };
+			const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f };
+
 			//Set beam end point to line trace end point
 			FVector BeamEndPoint{ End };
 
@@ -140,10 +137,24 @@ void AShooterCharacter::FireWeapon()
 				// Beam end point is now trace hit location
 				BeamEndPoint = ScreenTraceHit.Location;
 
-				if (ImpactParticles)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
-				}
+			}
+
+			// Perform a second trace, this time from the gun barrel
+			FHitResult WeaponTraceHit;
+			const FVector WeaponTraceStart{ SocketTransform.GetLocation() };
+			const FVector WeaponTraceEnd{ BeamEndPoint };
+
+			GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+
+			if (WeaponTraceHit.bBlockingHit) // Object between barrel and BeamEndPoint?
+			{
+				BeamEndPoint = WeaponTraceHit.Location;
+			}
+
+			// Spawn impact particles after updating BeamEndPoint
+			if (ImpactParticles)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEndPoint);
 			}
 
 			if (BeamParticles)
@@ -156,46 +167,14 @@ void AShooterCharacter::FireWeapon()
 			}
 		}
 
-		/*
->>>>>>> Stashed changes
-		FHitResult FireHit;
-		const FVector Start { SocketTransform.GetLocation() };
-		const FQuat Rotation { SocketTransform.GetRotation() };
-		const FVector RotationAxis { Rotation.GetAxisX() };
-		const FVector End { Start + RotationAxis * 50'000.f };
 
-		FVector BeamEndPoint { End };
-		
-		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECC_Visibility);
 
-		if(FireHit.bBlockingHit)
+		/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && HipFireMontage)
 		{
-			// DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-			// DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 5.f);
-
-			BeamEndPoint = FireHit.Location;
-
-			if (ImpactParticles)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
-			}
-		}
-
-		if (BeamParticles)
-		{
-			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
-			if (Beam)
-			{
-				Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
-			}
-		}
-	}
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && HipFireMontage)
-	{
-		AnimInstance->Montage_Play(HipFireMontage);
-		AnimInstance->Montage_JumpToSection(FName("StartFire"));
+			AnimInstance->Montage_Play(HipFireMontage);
+			AnimInstance->Montage_JumpToSection(FName("StartFire"));
+		}*/
 	}
 }
 
@@ -212,7 +191,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	check(PlayerInputComponent);
-	
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AShooterCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AShooterCharacter::TurnAtRate);
