@@ -37,6 +37,16 @@ protected:
 	*/
     void LookUpAtRate(float Rate);
 
+	/*Rotate controller based on mouse X movement
+	 *@param Value This is the input value from mouse movement
+	*/
+	void Turn(float Value);
+
+	/*Rotate controller based on mouse Y movement
+	 *@param Value This is the input value from mouse movement
+	*/
+	void LookUp(float Value);
+
 	/** Called when fire button is pressed */
 	void FireWeapon();
 
@@ -48,9 +58,12 @@ protected:
 
 	void SetCameraFOV(float DeltaTime);
 
+	void SetLookRates();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -60,14 +73,49 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, meta=(AllowPrivateAccess = true))
 	class USpringArmComponent* CameraBoom;
 
+	/* Camera that follows the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, meta=(AllowPrivateAccess = true))
 	class UCameraComponent* FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, meta= (AllowPrivateAccess = true))
+	/* Base turn rate, in deg/sec. Other scaling may affect the final turn rate */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Camera, meta= (AllowPrivateAccess = true))
 	float BaseTurnRate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, meta= (AllowPrivateAccess = true))
+	/* Base look up/down rate, in deg/sec. Other scaling may affect the final turn rate */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Camera, meta= (AllowPrivateAccess = true))
 	float BaseLookUpRate;
+
+	/* Turn rate when not aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float HipTurnRate;
+
+	/* Look up rate when not aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float HipLookUpRate;
+
+	/* Turn rate when aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float AimingTurnRate;
+
+	/* Look up rate when aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float AimingLookUpRate;
+
+	/* Mouse turn rate when not aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true, ClampMin = 0.f, ClampMax = 1.f))
+	float MouseHipTurnRate;
+
+	/* Mouse look up rate when not aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true, ClampMin = 0.f, ClampMax = 1.f))
+	float MouseHipLookUpRate;
+	
+	/* Mouse turn rate when aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true, ClampMin = 0.f, ClampMax = 1.f))
+	float MouseAimingTurnRate;
+
+	/* Mouse look up rate when aiming */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true, ClampMin = 0.f, ClampMax = 1.f))
+	float MouseAimingLookUpRate;
 
 	/** Randomized gunshot sound cue */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
