@@ -46,6 +46,8 @@ protected:
 	void AimingButtonPressed();
 	void AimingButtonReleased();
 
+	void SetCameraFOV(float DeltaTime);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -96,6 +98,13 @@ private:
 
 	/* Field of view value when zoomed in*/
 	float CameraZoomedFOV;
+
+	/*Current field of view this frame*/
+	float CameraCurrentFOV;
+
+	/* Interpolation speed for zooming when aiming*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = true))
+	float InterpSpeed;
 
 public:
 
