@@ -33,7 +33,13 @@ AShooterCharacter::AShooterCharacter() :
 	CameraDefaultFOV(0.f), //set in BeginPlay
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),
-	InterpSpeed(20.f)
+	InterpSpeed(20.f),
+	//Crosshair spread factors
+	CrosshairSpreadMultiplier(0.f),
+	CrosshairVelocityFactor(0.f),
+	CrosshairInAirFactor(0.f),
+	CrosshairAimFactor(0.f),
+	CrosshairShootingFactor(0.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -291,12 +297,58 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	FVector Velocity{ GetVelocity() };
 	Velocity.Z = 0.f;
 
+	// Calculate crosshair velocity factor
 	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
 		WalkSpeedRange, 
 		VelocityMultiplierRange, 
 		Velocity.Size());
 
-	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor;
+	// Calculate crosshair in air factor
+	if (GetCharacterMovement()->IsFalling()) // Character is in air
+	{
+		//Spread the crosshairs slowly while in air
+		CrosshairInAirFactor = FMath::FInterpTo(
+			CrosshairInAirFactor,
+			2.25f,
+			DeltaTime,
+			2.25f);
+	}
+	else // Character is on the ground
+	{
+		// Shrink the crosshair rapidly while on the ground
+		CrosshairInAirFactor = FMath::FInterpTo(
+			CrosshairInAirFactor,
+			0.f,
+			DeltaTime,
+			30.f);
+	}
+
+	// Calculate crosshair aim factor
+	if (bAiming) //Are we aiming?
+	{
+		// Shrink crosshairs rapidly while aiming
+		CrosshairAimFactor = FMath::FInterpTo(
+			CrosshairAimFactor,
+			.6f,
+			DeltaTime,
+			30.f);
+	}
+	else // Not aiming
+	{
+		// Spread crosshairs back to normal very quickly
+		CrosshairAimFactor = FMath::FInterpTo(
+			CrosshairAimFactor,
+			0.f,
+			DeltaTime,
+			30.f);
+	}
+
+	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor;
+}
+
+float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+{
+	return CrosshairSpreadMultiplier;
 }
 
 // Called every frame
@@ -336,8 +388,4 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("AimingButton", IE_Released, this, &AShooterCharacter::AimingButtonReleased);
 }
 
-float AShooterCharacter::GetCrosshairSpreadMultiplier() const
-{
-	return CrosshairSpreadMultiplier;
-}
 
