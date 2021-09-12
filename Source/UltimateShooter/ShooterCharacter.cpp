@@ -270,17 +270,6 @@ void AShooterCharacter::SetCameraFOV(float DeltaTime)
 	GetFollowCamera()->SetFieldOfView(CameraCurrentFOV);
 }
 
-// Called every frame
-void AShooterCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//Handle interpolation for zoom when aiming
-	SetCameraFOV(DeltaTime);
-	
-	SetLookRates();
-}
-
 void AShooterCharacter::SetLookRates()
 {
 	if (bAiming)
@@ -294,6 +283,37 @@ void AShooterCharacter::SetLookRates()
 		BaseLookUpRate = HipLookUpRate;
 	}
 }
+
+void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
+{
+	FVector2D WalkSpeedRange{ 0.f, 600.f };
+	FVector2D VelocityMultiplierRange{ 0.f, 1.f };
+	FVector Velocity{ GetVelocity() };
+	Velocity.Z = 0.f;
+
+	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
+		WalkSpeedRange, 
+		VelocityMultiplierRange, 
+		Velocity.Size());
+
+	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor;
+}
+
+// Called every frame
+void AShooterCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Handle interpolation for zoom when aiming
+	SetCameraFOV(DeltaTime);
+	
+	// Change look sensitivity based on aiming
+	SetLookRates();
+
+	// Calculate crosshair spread multiplier
+	CalculateCrosshairSpread(DeltaTime);
+}
+
 
 // Called to bind functionality to input
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -314,5 +334,10 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &AShooterCharacter::FireWeapon);
 	PlayerInputComponent->BindAction("AimingButton", IE_Pressed, this, &AShooterCharacter::AimingButtonPressed);
 	PlayerInputComponent->BindAction("AimingButton", IE_Released, this, &AShooterCharacter::AimingButtonReleased);
+}
+
+float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+{
+	return CrosshairSpreadMultiplier;
 }
 
