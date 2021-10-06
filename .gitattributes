@@ -19,4 +19,9 @@ Content/Audio/Cue_Drone.uasset filter=lfs diff=lfs merge=lfs -text
 Content/Audio/Cue_Office.uasset filter=lfs diff=lfs merge=lfs -text
 Content/Audio/Cue_Storage.uasset filter=lfs diff=lfs merge=lfs -text
 Content/Audio/S_Office.uasset filter=lfs diff=lfs merge=lfs -text
-Content/Blueprints/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Blueprints/Data filter=lfs diff=lfs merge=lfs -text
+Content/Blueprints/GamePlay filter=lfs diff=lfs merge=lfs -text
+Content/Blueprints/Notify filter=lfs diff=lfs merge=lfs -text
+Content/Blueprints/Pawn filter=lfs diff=lfs merge=lfs -text
+Content/Blueprints/RenderTarget filter=lfs diff=lfs merge=lfs -text
+Content/Blueprints/UI filter=lfs diff=lfs merge=lfs -text
