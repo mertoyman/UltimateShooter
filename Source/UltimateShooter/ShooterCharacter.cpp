@@ -48,7 +48,9 @@ AShooterCharacter::AShooterCharacter() :
 	//Automatic fire variables
 	bShouldFire(true),
 	AutomaticFireRate(.1f),
-	bFireButtonPressed(false)
+	bFireButtonPressed(false),
+	//Item trace variable
+	bShouldTraceForItems(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -84,6 +86,25 @@ void AShooterCharacter::BeginPlay()
 		CameraDefaultFOV = GetFollowCamera()->FieldOfView;
 		CameraCurrentFOV = CameraDefaultFOV;
 	}
+}
+
+// Called every frame
+void AShooterCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Handle interpolation for zoom when aiming
+	SetCameraFOV(DeltaTime);
+
+	// Change look sensitivity based on aiming
+	SetLookRates();
+
+	// Calculate crosshair spread multiplier
+	CalculateCrosshairSpread(DeltaTime);
+
+	// Check OverlappedItemCount, then trace for items
+	TraceForItems();
+	
 }
 
 void AShooterCharacter::MoveForward(float Value)
@@ -152,6 +173,25 @@ void AShooterCharacter::LookUp(float Value)
 	}
 
 	AddControllerPitchInput(Value * LookUpScaleFactor);
+}
+
+void AShooterCharacter::TraceForItems()
+{
+	if (bShouldTraceForItems)
+	{
+		FHitResult ItemTraceResult;
+		FVector HitLocation;
+		TraceUnderCrosshairs(ItemTraceResult, HitLocation);
+		if (ItemTraceResult.bBlockingHit)
+		{
+			AItem* HitItem = Cast<AItem>(ItemTraceResult.Actor);
+			if (HitItem && HitItem->GetPickupWidget())
+			{
+				//Show item's pickup widget
+				HitItem->GetPickupWidget()->SetVisibility(true);
+			}
+		}
+	}
 }
 
 bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation)
@@ -300,14 +340,27 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 			60.f);
 	}
 
-	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor +
-		CrosshairShootingFactor;
+	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
 }
 
 
 float AShooterCharacter::GetCrosshairSpreadMultiplier() const
 {
 	return CrosshairSpreadMultiplier;
+}
+
+void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
+{
+	if (OverlappedItemCount + Amount <= 0)
+	{
+		OverlappedItemCount = 0;
+		bShouldTraceForItems = false;
+	}
+	else
+	{
+		OverlappedItemCount += Amount;
+		bShouldTraceForItems = true;
+	}
 }
 
 void AShooterCharacter::StartCrosshairBulletFire()
@@ -456,35 +509,6 @@ bool AShooterCharacter::TraceUnderCrosshairs(
 		}
 	}
 	return false;
-}
-
-
-// Called every frame
-void AShooterCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	// Handle interpolation for zoom when aiming
-	SetCameraFOV(DeltaTime);
-
-	// Change look sensitivity based on aiming
-	SetLookRates();
-
-	// Calculate crosshair spread multiplier
-	CalculateCrosshairSpread(DeltaTime);
-
-	FHitResult ItemTraceResult;
-	FVector HitLocation;
-	TraceUnderCrosshairs(ItemTraceResult, HitLocation);
-	if (ItemTraceResult.bBlockingHit)
-	{
-		AItem* HitItem = Cast<AItem>(ItemTraceResult.Actor);
-		if (HitItem && HitItem->GetPickupWidget())
-		{
-			//Show item's pickup widget
-			HitItem->GetPickupWidget()->SetVisibility(true);
-		}
-	}
 }
 
 // Called to bind functionality to input
