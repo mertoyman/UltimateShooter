@@ -112,5 +112,6 @@ public:
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 	FORCEINLINE EItemState GetItemState() const {return ItemState;}
+	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
 	void SetItemState(EItemState State);
 };
