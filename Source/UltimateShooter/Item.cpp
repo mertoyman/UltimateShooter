@@ -12,7 +12,8 @@
 AItem::AItem() :
 	ItemName("Default"),
 	ItemCount(0),
-	ItemRarity(EItemRarity::Eir_Common)
+	ItemRarity(EItemRarity::EIR_Common),
+	ItemState(EItemState::EIS_Pickup)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -94,25 +95,25 @@ void AItem::SetActiveStars()
 
 	switch (ItemRarity)
 	{
-		case EItemRarity::Eir_Damaged:
+		case EItemRarity::EIR_Damaged:
 			ActiveStars[1] = true;
 			break;
-		case EItemRarity::Eir_Common:
+		case EItemRarity::EIR_Common:
 			ActiveStars[1] = true;
 			ActiveStars[2] = true;
 			break;
-		case EItemRarity::Eir_Uncommon:
+		case EItemRarity::EIR_Uncommon:
 			ActiveStars[1] = true;
 			ActiveStars[2] = true;
 			ActiveStars[3] = true;
 			break;
-		case EItemRarity::Eir_Rare:
+		case EItemRarity::EIR_Rare:
 			ActiveStars[1] = true;
 			ActiveStars[2] = true;
 			ActiveStars[3] = true;
 			ActiveStars[4] = true;
 			break;
-		case EItemRarity::Eir_Legendary:
+		case EItemRarity::EIR_Legendary:
 			ActiveStars[1] = true;
 			ActiveStars[2] = true;
 			ActiveStars[3] = true;

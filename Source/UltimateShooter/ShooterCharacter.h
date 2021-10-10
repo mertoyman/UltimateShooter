@@ -236,7 +236,7 @@ private:
 
 	/* Currently equipped weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= Combat, meta=(AllowPrivateAccess=true))
-	AWeapon* EquippedWeapon;
+	class AWeapon* EquippedWeapon;
 
 	/* Set this in Blueprints for the default Weapon class */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Combat, meta=(AllowPrivateAccess=true))

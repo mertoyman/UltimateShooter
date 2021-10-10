@@ -9,13 +9,25 @@
 UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
-	Eir_Damaged UMETA(DisplayName = "Damaged"),
-	Eir_Common UMETA(DisplayName = "Common"),
-	Eir_Uncommon UMETA(DisplayName = "UnCommon"),
-	Eir_Rare UMETA(DisplayName = "Rare"),
-	Eir_Legendary UMETA(DisplayName = "Legendary"),
+	EIR_Damaged UMETA(DisplayName = "Damaged"),
+	EIR_Common UMETA(DisplayName = "Common"),
+	EIR_Uncommon UMETA(DisplayName = "UnCommon"),
+	EIR_Rare UMETA(DisplayName = "Rare"),
+	EIR_Legendary UMETA(DisplayName = "Legendary"),
 
-	Eir_MAX UMETA(DisplayName = "DefaultMAX")
+	EIR_MAX UMETA(DisplayName = "DefaultMAX")
+};
+
+UENUM(BlueprintType)
+enum class EItemState : uint8
+{
+	EIS_Pickup UMETA(DisplayName = "Pickup"),
+	EIS_EquipInterping UMETA(DisplayName = "EquipInterping"),
+	EIS_PickedUp UMETA(DisplayName = "PickedUp"),
+	EIS_Equipped UMETA(DisplayName = "Equipped"),
+	EIS_Falling UMETA(DisplayName = "Falling"),
+
+	EIS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
 UCLASS()
@@ -88,8 +100,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item Properties", meta= (AllowPrivateAccess=true))
 	TArray<bool> ActiveStars;
 
+	/* State of the Item */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item Properties", meta= (AllowPrivateAccess=true))
+	EItemState ItemState;
+
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
+	FORCEINLINE EItemState GetItemState() const {return ItemState;}
+	FORCEINLINE void SetItemState(EItemState State) { ItemState = State; }
 };
