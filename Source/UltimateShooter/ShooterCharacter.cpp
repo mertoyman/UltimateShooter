@@ -235,10 +235,7 @@ void AShooterCharacter::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if (WeaponToEquip)
 	{
-		WeaponToEquip->GetAreaSphere()->SetCollisionResponseToAllChannels(ECR_Ignore);
-		WeaponToEquip->GetAreaSphere()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		WeaponToEquip->GetCollisionBox()->SetCollisionResponseToAllChannels(ECR_Ignore);
-		WeaponToEquip->GetCollisionBox()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		
 		
 		// Get the Hand Socket
 		const USkeletalMeshSocket* HandSocket = GetMesh()->GetSocketByName("RightHandSocket");
