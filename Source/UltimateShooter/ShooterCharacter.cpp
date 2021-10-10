@@ -5,6 +5,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "Item.h"
+#include "Weapon.h"
 #include "Camera/CameraComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -86,6 +87,9 @@ void AShooterCharacter::BeginPlay()
 		CameraDefaultFOV = GetFollowCamera()->FieldOfView;
 		CameraCurrentFOV = CameraDefaultFOV;
 	}
+
+	// Spawn the default weapon and attach to the mesh
+	SpawnDefaultWeapon();
 }
 
 // Called every frame
@@ -210,6 +214,26 @@ void AShooterCharacter::TraceForItems()
 	{
 		//No longer overlapping any items
 		TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+	}
+}
+
+void AShooterCharacter::SpawnDefaultWeapon()
+{
+	// Check the TSubclassOf variables
+	if (DefaultWeaponClass)
+	{
+		// Spawn the weapon
+		AWeapon* DefaultWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeaponClass);
+		// Get the Hand Socket
+		const USkeletalMeshSocket* HandSocket = GetMesh()->GetSocketByName("RightHandSocket");
+		if (HandSocket)
+		{
+			// Attach the weapon to the hand socket RightHandSocket
+			HandSocket->AttachActor(DefaultWeapon, GetMesh());
+		}
+
+		// Set EquippedWeapon to the newly spawned Weapon
+		EquippedWeapon = DefaultWeapon;
 	}
 }
 
