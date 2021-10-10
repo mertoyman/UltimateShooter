@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Weapon.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -83,8 +84,11 @@ protected:
 	/* Trace for items if overlapped item count is greater than zero */
 	void TraceForItems();
 
-	/* Spawm the default weapon on BeginPlay */
-	void SpawnDefaultWeapon();
+	/* Spawms the default weapon and equips it */
+	AWeapon* SpawnDefaultWeapon() const;
+
+	/* Takes a weapon and attaches it to the mesh */
+	void EquipWeapon(class AWeapon* WeaponToEquip);
 
 public:	
 	// Called every frame
@@ -232,7 +236,7 @@ private:
 
 	/* Currently equipped weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= Combat, meta=(AllowPrivateAccess=true))
-	class AWeapon* EquippedWeapon;
+	AWeapon* EquippedWeapon;
 
 	/* Set this in Blueprints for the default Weapon class */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Combat, meta=(AllowPrivateAccess=true))
