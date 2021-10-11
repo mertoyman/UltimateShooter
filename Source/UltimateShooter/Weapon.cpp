@@ -4,24 +4,50 @@
 #include "Weapon.h"
 
 // Sets default values
-AWeapon::AWeapon()
+AWeapon::AWeapon() :
+	ThrowWeaponTime(0.7f),
+	bFalling(false)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+ 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void AWeapon::BeginPlay()
+void AWeapon::Tick(float DeltaSeconds)
 {
-	Super::BeginPlay();
+	Super::Tick(DeltaSeconds);
+
+	// Keep the Weapon upright
+	if(GetItemState() == EItemState::EIS_Falling && bFalling)
+	{
+		const FRotator MeshRotation {0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f};
+		GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
+	}
+}
+
+void AWeapon::ThrowWeapon()
+{
+	const FRotator MeshRotation { 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f};
+	GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
+
+	const FVector MeshForward { GetItemMesh()->GetForwardVector() };
+	const FVector MeshRight (GetItemMesh()->GetRightVector());
+
+	//Direction in which we throw the Weapon
+	FVector ImpulseDirection = MeshRight.RotateAngleAxis(-20.f, MeshForward);
+
+	const float RandomRotation { FMath::RandRange(0.f, 30.f) };
+	ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector{0.f, 0.f, 1.f});
+	ImpulseDirection *= 2000.f;
+	GetItemMesh()->AddImpulse(ImpulseDirection);
 	
+	bFalling = true;
+	GetWorldTimerManager().SetTimer(ThrowWeaponTimer, this, &AWeapon::StopFalling, ThrowWeaponTime);
 }
 
-// Called every frame
-void AWeapon::Tick(float DeltaTime)
+void AWeapon::StopFalling()
 {
-	Super::Tick(DeltaTime);
-
+	bFalling = false;
+	SetItemState(EItemState::EIS_Pickup);
 }
+
+
 

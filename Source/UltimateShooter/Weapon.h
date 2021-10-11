@@ -15,12 +15,19 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void StopFalling();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:
+	FTimerHandle ThrowWeaponTimer;
+	float ThrowWeaponTime;
+	bool bFalling;
 
+public:
+	
+	/* Adds an impulse to the Weapon */
+	void ThrowWeapon();
+	
 };
