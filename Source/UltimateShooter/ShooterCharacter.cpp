@@ -53,7 +53,10 @@ AShooterCharacter::AShooterCharacter() :
 	AutomaticFireRate(.1f),
 	bFireButtonPressed(false),
 	//Item trace variable
-	bShouldTraceForItems(false)
+	bShouldTraceForItems(false),
+	//Camera interp locations variables
+	CameraInterpDistance(250.f),
+	CameraInterpElevation(65.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -90,6 +93,10 @@ void AShooterCharacter::BeginPlay()
 		CameraCurrentFOV = CameraDefaultFOV;
 	}
 
+	FVector IntepLocation = GetCameraInterpLocation();
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *IntepLocation.ToString());
+	
 	// Spawn the default weapon and equip it
 	EquipWeapon(SpawnDefaultWeapon());
 }
@@ -451,6 +458,17 @@ void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
 		OverlappedItemCount += Amount;
 		bShouldTraceForItems = true;
 	}
+}
+
+FVector AShooterCharacter::GetCameraInterpLocation()
+{
+	const FVector CameraWorldLocation { FollowCamera->GetComponentLocation() };
+	const FVector CameraForwardVector { FollowCamera->GetForwardVector() };
+	const FVector CameraUpVector { FollowCamera->GetUpVector() };
+	// Desired location
+	return CameraWorldLocation +
+			CameraForwardVector * CameraInterpDistance +
+			CameraUpVector * CameraInterpElevation;
 }
 
 void AShooterCharacter::StartCrosshairBulletFire()
