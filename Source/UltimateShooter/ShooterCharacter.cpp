@@ -287,6 +287,14 @@ void AShooterCharacter::InitializeAmmoMap()
 	AmmoMap.Add(EAmmoType::EAT_AR, StartingARAmmo);
 }
 
+bool AShooterCharacter::WeaponHasAmmo()
+{
+	if (!EquippedWeapon) return nullptr;
+
+	return EquippedWeapon->GetAmmo() > 0;
+	
+}
+
 void AShooterCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem)
@@ -557,14 +565,23 @@ void AShooterCharacter::FireWeapon()
 
 		//Start bullet fire timer for crosshairs
 		StartCrosshairBulletFire();
+
+		if (EquippedWeapon)
+		{
+			// Subtract 1 from Weapon's Ammo
+			EquippedWeapon->DecrementAmmo();
+		}
 	}
 }
 
 void AShooterCharacter::FireButtonPressed()
 {
-	bFireButtonPressed = true;
+	if (WeaponHasAmmo())
+	{
+		bFireButtonPressed = true;
 
-	StartFireTimer();
+		StartFireTimer();
+	}
 }
 
 void AShooterCharacter::FireButtonReleased()
@@ -586,11 +603,14 @@ void AShooterCharacter::StartFireTimer()
 
 void AShooterCharacter::AutoFireReset()
 {
-	bShouldFire = true;
-
-	if (bFireButtonPressed)
+	if (WeaponHasAmmo())
 	{
-		StartFireTimer();
+		bShouldFire = true;
+
+		if (bFireButtonPressed)
+		{
+			StartFireTimer();
+		}
 	}
 }
 
