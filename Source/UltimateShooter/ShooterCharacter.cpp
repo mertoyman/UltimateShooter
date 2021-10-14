@@ -271,6 +271,20 @@ bool AShooterCharacter::WeaponHasAmmo()
 	
 }
 
+bool AShooterCharacter::CarryingAmmo()
+{
+	if (!EquippedWeapon) return false;
+
+	const auto AmmoType = EquippedWeapon->GetAmmoType();
+
+	if(AmmoMap.Contains(AmmoType))
+	{
+		return AmmoMap[AmmoType] > 0;
+	}
+
+	return false;
+}
+
 void AShooterCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem)
@@ -284,6 +298,64 @@ void AShooterCharacter::SelectButtonReleased()
 	
 }
 
+void AShooterCharacter::ReloadButtonPressed()
+{
+	ReloadWeapon();
+}
+
+void AShooterCharacter::ReloadWeapon()
+{
+	if(CombatState != ECombatState::ECS_Unoccupied) return;
+	if(!EquippedWeapon) return;
+
+	// Do we have ammo of the correct type?
+	if (CarryingAmmo())
+	{
+		CombatState = ECombatState::ECS_Reloading;
+		
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && ReloadMontage)
+		{
+			AnimInstance->Montage_Play(ReloadMontage);
+			AnimInstance->Montage_JumpToSection(EquippedWeapon->GetReloadMontageSection());
+		}
+	}
+}
+
+void AShooterCharacter::FinishReloading()
+{
+	// Update the Combat State
+	CombatState = ECombatState::ECS_Unoccupied;
+
+	if (!EquippedWeapon) return;
+
+	const auto AmmoType = EquippedWeapon->GetAmmoType();
+	
+	// Update the AmmoMap
+	if (AmmoMap.Contains(AmmoType))
+	{
+		// Amount of ammo the Character is carrying of the EquippedWeapon type
+		int32 CarriedAmmo = AmmoMap[AmmoType];
+
+		// Space left in the magazine of the Equipped Weapon
+		const int32 MagEmptySpace = EquippedWeapon->GetMagazineCapacity() - EquippedWeapon->GetAmmo();
+
+		if (MagEmptySpace > CarriedAmmo)
+		{
+			// Reload the magazine with all the ammo we are carrrying
+			EquippedWeapon->ReloadAmmo(CarriedAmmo);
+			CarriedAmmo = 0;
+			AmmoMap.Add(AmmoType, CarriedAmmo);
+		}
+		else
+		{
+			//fill the magazine
+			EquippedWeapon->ReloadAmmo(MagEmptySpace);
+			CarriedAmmo -= MagEmptySpace;
+			AmmoMap.Add(AmmoType, CarriedAmmo);
+		}
+	}
+}
 
 bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation)
 {
@@ -463,7 +535,8 @@ void AShooterCharacter::AutoFireReset()
 	}
 	else
 	{
-		//Reload weapon
+		//Automatically Reload weapon
+		ReloadWeapon();
 	}
 }
 
@@ -559,7 +632,6 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 
 	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
 }
-
 
 float AShooterCharacter::GetCrosshairSpreadMultiplier() const
 {
@@ -696,4 +768,5 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("AimingButton", IE_Released, this, &AShooterCharacter::AimingButtonReleased);
 	PlayerInputComponent->BindAction("DropWeapon", IE_Pressed, this, &AShooterCharacter::SelectButtonPressed);
 	PlayerInputComponent->BindAction("DropWeapon", IE_Released, this, &AShooterCharacter::SelectButtonReleased);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterCharacter::ReloadButtonPressed);
 }

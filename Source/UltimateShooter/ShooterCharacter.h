@@ -4,20 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Weapon.h"
-
+#include "AmmoType.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
+
 #include "ShooterCharacter.generated.h"
-
-UENUM(BlueprintType)
-enum class EAmmoType : uint8
-{
-	
-	EAT_9mm UMETA(DisplayName = "9mm"),
-	EAT_AR UMETA(DisplayName = "AssaultRifle"),
-
-	EAT_MAX UMETA(DisplayName = "DefaultMAX")
-};
 
 UENUM(BlueprintType)
 enum class ECombatState : uint8
@@ -112,24 +103,35 @@ protected:
 	/* Spawms the default weapon and equips it */
 	AWeapon* SpawnDefaultWeapon() const;
 
+	void SelectButtonPressed();
+
+	void SelectButtonReleased();
+	
 	/* Takes a weapon and attaches it to the mesh */
 	void EquipWeapon(class AWeapon* WeaponToEquip);
 
 	/* Drop weapon and let it fall to the ground */
+
 	void DropWeapon();
-
-	void SelectButtonPressed();
-
-	void SelectButtonReleased();
 
 	/* Drop currently equipped Weapon and equips TraceHitItem */ 
 	void SwapWeapon(AWeapon* WeaponToSwap);
 
+
+	void ReloadButtonPressed();
+
+	/* Handle reloading of the weapon */
+	void ReloadWeapon();
+	
 	/* Initialize ammo map with ammo values */
 	void InitializeAmmoMap();
 
 	/* Check to make sure out weapon has ammo */
 	bool WeaponHasAmmo();
+
+	/* Checks to see if we have ammo of the Equipped Weapon's ammo type */
+	bool CarryingAmmo();
+
 
 public:	
 	// Called every frame
@@ -310,6 +312,13 @@ private:
 	/* Combat state can only fire or reload when unoccupied */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat, meta=(AllowPrivateAccess=true))
 	ECombatState CombatState;
+
+	/* Montage for reloading */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UAnimMontage* ReloadMontage;
+
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
 
 public:
 	/* Return CameraBoom subobject*/
