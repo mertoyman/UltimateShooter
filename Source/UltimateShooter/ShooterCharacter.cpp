@@ -59,7 +59,9 @@ AShooterCharacter::AShooterCharacter() :
 	CameraInterpElevation(65.f),
 	//Starting ammo amounts
 	Starting9mmAmmo(75),
-	StartingARAmmo(120)
+	StartingARAmmo(120),
+	//Combat variables
+	CombatState(ECombatState::ECS_Unoccupied)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -125,72 +127,48 @@ void AShooterCharacter::Tick(float DeltaTime)
 	
 }
 
-void AShooterCharacter::MoveForward(float Value)
+bool AShooterCharacter::TraceUnderCrosshairs(
+	FHitResult& OutHitResult,
+	FVector& OutHitLocation)
 {
-	if (Controller && Value != 0.f)
+	//Get current size of viewport
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport)
 	{
-		//find out which way is forward
-		const FRotator Rotation{Controller->GetControlRotation()};
-		const FRotator YawRotation{0, Rotation.Yaw, 0};
-
-		const FVector Direction{FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X)};
-		AddMovementInput(Direction, Value);
-	}
-}
-
-void AShooterCharacter::MoveRight(float Value)
-{
-	//find out which way is right
-	const FRotator Rotation{Controller->GetControlRotation()};
-	const FRotator YawRotation{0, Rotation.Yaw, 0};
-
-	const FVector Direction{FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y)};
-
-	AddMovementInput(Direction, Value);
-}
-
-void AShooterCharacter::TurnAtRate(float Rate)
-{
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds()); // deg/sec * sec/frame
-}
-
-void AShooterCharacter::LookUpAtRate(float Rate)
-{
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
-}
-
-void AShooterCharacter::Turn(float Value)
-{
-	float TurnScaleFactor{};
-
-	if (bAiming)
-	{
-		TurnScaleFactor = MouseAimingTurnRate;
-	}
-	else
-	{
-		TurnScaleFactor = MouseHipTurnRate;
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
 	}
 
-	AddControllerYawInput(Value * TurnScaleFactor);
-}
+	//Get screen space location of crosshair
+	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+	//CrosshairLocation.Y -= 50.f;
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
 
-void AShooterCharacter::LookUp(float Value)
-{
-	float LookUpScaleFactor{};
+	//Get world location and direction of crosshair
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection);
 
-	if (bAiming)
+	if (bScreenToWorld)
 	{
-		LookUpScaleFactor = MouseAimingLookUpRate;
+		// Trace from crosshair world location outward
+		const FVector Start{CrosshairWorldPosition};
+		const FVector End{Start + CrosshairWorldDirection * 50'000.f};
+		OutHitLocation = End;
+		GetWorld()->LineTraceSingleByChannel(
+			OutHitResult,
+			Start,
+			End,
+			ECC_Visibility);
+		if (OutHitResult.bBlockingHit)
+		{
+			OutHitLocation = OutHitResult.Location;
+			return true;
+		}
 	}
-	else
-	{
-		LookUpScaleFactor = MouseHipLookUpRate;
-	}
-
-	AddControllerPitchInput(Value * LookUpScaleFactor);
+	return false;
 }
 
 void AShooterCharacter::TraceForItems()
@@ -247,8 +225,6 @@ void AShooterCharacter::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if (WeaponToEquip)
 	{
-		
-		
 		// Get the Hand Socket
 		const USkeletalMeshSocket* HandSocket = GetMesh()->GetSocketByName("RightHandSocket");
 		if (HandSocket)
@@ -343,6 +319,253 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 	return false;
 }
 
+void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
+{
+	if (OverlappedItemCount + Amount <= 0)
+	{
+		OverlappedItemCount = 0;
+		bShouldTraceForItems = false;
+	}
+	else
+	{
+		OverlappedItemCount += Amount;
+		bShouldTraceForItems = true;
+	}
+}
+
+FVector AShooterCharacter::GetCameraInterpLocation()
+{
+	const FVector CameraWorldLocation { FollowCamera->GetComponentLocation() };
+	const FVector CameraForwardVector { FollowCamera->GetForwardVector() };
+	const FVector CameraUpVector { FollowCamera->GetUpVector() };
+	// Desired location
+	return CameraWorldLocation +
+			CameraForwardVector * CameraInterpDistance +
+			CameraUpVector * CameraInterpElevation;
+}
+
+void AShooterCharacter::GetPickupItem(AItem* Item)
+{
+	auto Weapon = Cast<AWeapon>(Item);
+	if (Weapon)
+	{
+		SwapWeapon(Weapon);
+	}
+}
+
+void AShooterCharacter::FireButtonPressed()
+{
+	bFireButtonPressed = true;
+	FireWeapon();
+	// if (WeaponHasAmmo())
+	// {
+	// 	StartFireTimer();
+	// }
+}
+
+void AShooterCharacter::FireButtonReleased()
+{
+	bFireButtonPressed = false;
+}
+
+
+void AShooterCharacter::PlayFireSound()
+{
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySound2D(this, FireSound);
+	}
+}
+
+void AShooterCharacter::SendBullet()
+{
+	const USkeletalMeshSocket* BarrelSocket = EquippedWeapon->GetItemMesh()->GetSocketByName("BarrelSocket");
+		if (BarrelSocket)
+		{
+			const FTransform SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh());
+
+			if (MuzzleFlash)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+			}
+
+			FVector BeamEnd;
+			bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
+			if (bBeamEnd)
+			{
+				// Spawn impact particles after updating BeamEndPoint
+				if (ImpactParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEnd);
+				}
+			}
+		
+			if (BeamParticles)
+			{
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(), BeamParticles, SocketTransform);
+				if (Beam)
+				{
+					Beam->SetVectorParameter(FName("Target"), BeamEnd);
+				}
+			}
+		}
+}
+
+void AShooterCharacter::PlayHipFireMontage()
+{
+	// Play Hip Fire Montage
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HipFireMontage)
+	{
+		AnimInstance->Montage_Play(HipFireMontage);
+		AnimInstance->Montage_JumpToSection(FName("StartFire"));
+	}
+}
+
+void AShooterCharacter::FireWeapon()
+{
+	if(!EquippedWeapon) return;
+
+	if(CombatState != ECombatState::ECS_Unoccupied) return;
+
+	if(WeaponHasAmmo())
+	{
+		PlayFireSound();
+		SendBullet();
+		PlayHipFireMontage();
+		StartCrosshairBulletFire();
+		EquippedWeapon->DecrementAmmo();
+
+		StartFireTimer();
+	}
+	
+	
+}
+
+void AShooterCharacter::StartFireTimer()
+{
+	CombatState = ECombatState::ECS_FireTimerInProgress;
+	
+	GetWorldTimerManager().SetTimer(AutoFireTimer, this, &AShooterCharacter::AutoFireReset, AutomaticFireRate);
+}
+
+void AShooterCharacter::AutoFireReset()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
+	
+	if (WeaponHasAmmo())
+	{
+		if (bFireButtonPressed)
+		{
+			FireWeapon();
+		}
+	}
+	else
+	{
+		//Reload weapon
+	}
+}
+
+void AShooterCharacter::FinishCrosshairBulletFire()
+{
+	bFiringBullet = false;
+
+	GetWorldTimerManager().ClearTimer(CrosshairShootTimer);
+}
+
+void AShooterCharacter::StartCrosshairBulletFire()
+{
+	bFiringBullet = true;
+
+	GetWorldTimerManager().SetTimer(
+		CrosshairShootTimer,
+		this,
+		&AShooterCharacter::FinishCrosshairBulletFire,
+		ShootTimeDuration);
+}
+
+void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
+{
+	FVector2D WalkSpeedRange{0.f, 600.f};
+	FVector2D VelocityMultiplierRange{0.f, 1.f};
+	FVector Velocity{GetVelocity()};
+	Velocity.Z = 0.f;
+
+	// Calculate crosshair velocity factor
+	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
+		WalkSpeedRange,
+		VelocityMultiplierRange,
+		Velocity.Size());
+
+	// Calculate crosshair in air factor
+	if (GetCharacterMovement()->IsFalling()) // Character is in air
+		{
+		//Spread the crosshairs slowly while in air
+		CrosshairInAirFactor = FMath::FInterpTo(
+			CrosshairInAirFactor,
+			2.25f,
+			DeltaTime,
+			2.25f);
+		}
+	else // Character is on the ground
+		{
+		// Shrink the crosshair rapidly while on the ground
+		CrosshairInAirFactor = FMath::FInterpTo(
+			CrosshairInAirFactor,
+			0.f,
+			DeltaTime,
+			30.f);
+		}
+
+	// Calculate crosshair aim factor
+	if (bAiming) //Are we aiming?
+		{
+		// Shrink crosshairs rapidly while aiming
+		CrosshairAimFactor = FMath::FInterpTo(
+			CrosshairAimFactor,
+			.6f,
+			DeltaTime,
+			30.f);
+		}
+	else // Not aiming
+		{
+		// Spread crosshairs back to normal very quickly
+		CrosshairAimFactor = FMath::FInterpTo(
+			CrosshairAimFactor,
+			0.f,
+			DeltaTime,
+			30.f);
+		}
+
+	if (bFiringBullet) // Are we firing bullet?
+		{
+		// Spread crosshairs rapidly while firing
+		CrosshairShootingFactor = FMath::FInterpTo(
+			CrosshairShootingFactor,
+			.3f,
+			DeltaTime,
+			60.f);
+		}
+	else // Not firing
+		{
+		// Shrink crosshairs rapidly while aiming
+		CrosshairShootingFactor = FMath::FInterpTo(
+			CrosshairShootingFactor,
+			0.f,
+			DeltaTime,
+			60.f);
+		}
+
+	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
+}
+
+
+float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+{
+	return CrosshairSpreadMultiplier;
+}
+
 void AShooterCharacter::AimingButtonPressed()
 {
 	bAiming = true;
@@ -383,281 +606,72 @@ void AShooterCharacter::SetLookRates()
 	}
 }
 
-void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
+void AShooterCharacter::MoveForward(float Value)
 {
-	FVector2D WalkSpeedRange{0.f, 600.f};
-	FVector2D VelocityMultiplierRange{0.f, 1.f};
-	FVector Velocity{GetVelocity()};
-	Velocity.Z = 0.f;
+	if (Controller && Value != 0.f)
+	{
+		//find out which way is forward
+		const FRotator Rotation{Controller->GetControlRotation()};
+		const FRotator YawRotation{0, Rotation.Yaw, 0};
 
-	// Calculate crosshair velocity factor
-	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
-		WalkSpeedRange,
-		VelocityMultiplierRange,
-		Velocity.Size());
-
-	// Calculate crosshair in air factor
-	if (GetCharacterMovement()->IsFalling()) // Character is in air
-	{
-		//Spread the crosshairs slowly while in air
-		CrosshairInAirFactor = FMath::FInterpTo(
-			CrosshairInAirFactor,
-			2.25f,
-			DeltaTime,
-			2.25f);
+		const FVector Direction{FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X)};
+		AddMovementInput(Direction, Value);
 	}
-	else // Character is on the ground
-	{
-		// Shrink the crosshair rapidly while on the ground
-		CrosshairInAirFactor = FMath::FInterpTo(
-			CrosshairInAirFactor,
-			0.f,
-			DeltaTime,
-			30.f);
-	}
-
-	// Calculate crosshair aim factor
-	if (bAiming) //Are we aiming?
-	{
-		// Shrink crosshairs rapidly while aiming
-		CrosshairAimFactor = FMath::FInterpTo(
-			CrosshairAimFactor,
-			.6f,
-			DeltaTime,
-			30.f);
-	}
-	else // Not aiming
-	{
-		// Spread crosshairs back to normal very quickly
-		CrosshairAimFactor = FMath::FInterpTo(
-			CrosshairAimFactor,
-			0.f,
-			DeltaTime,
-			30.f);
-	}
-
-	if (bFiringBullet) // Are we firing bullet?
-	{
-		// Spread crosshairs rapidly while firing
-		CrosshairShootingFactor = FMath::FInterpTo(
-			CrosshairShootingFactor,
-			.3f,
-			DeltaTime,
-			60.f);
-	}
-	else // Not firing
-	{
-		// Shrink crosshairs rapidly while aiming
-		CrosshairShootingFactor = FMath::FInterpTo(
-			CrosshairShootingFactor,
-			0.f,
-			DeltaTime,
-			60.f);
-	}
-
-	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
 }
 
-
-float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+void AShooterCharacter::MoveRight(float Value)
 {
-	return CrosshairSpreadMultiplier;
+	//find out which way is right
+	const FRotator Rotation{Controller->GetControlRotation()};
+	const FRotator YawRotation{0, Rotation.Yaw, 0};
+
+	const FVector Direction{FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y)};
+
+	AddMovementInput(Direction, Value);
 }
 
-void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
+void AShooterCharacter::TurnAtRate(float Rate)
 {
-	if (OverlappedItemCount + Amount <= 0)
+	// calculate delta for this frame from the rate information
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds()); // deg/sec * sec/frame
+}
+
+void AShooterCharacter::LookUpAtRate(float Rate)
+{
+	// calculate delta for this frame from the rate information
+	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AShooterCharacter::Turn(float Value)
+{
+	float TurnScaleFactor{};
+
+	if (bAiming)
 	{
-		OverlappedItemCount = 0;
-		bShouldTraceForItems = false;
+		TurnScaleFactor = MouseAimingTurnRate;
 	}
 	else
 	{
-		OverlappedItemCount += Amount;
-		bShouldTraceForItems = true;
+		TurnScaleFactor = MouseHipTurnRate;
 	}
+
+	AddControllerYawInput(Value * TurnScaleFactor);
 }
 
-FVector AShooterCharacter::GetCameraInterpLocation()
+void AShooterCharacter::LookUp(float Value)
 {
-	const FVector CameraWorldLocation { FollowCamera->GetComponentLocation() };
-	const FVector CameraForwardVector { FollowCamera->GetForwardVector() };
-	const FVector CameraUpVector { FollowCamera->GetUpVector() };
-	// Desired location
-	return CameraWorldLocation +
-			CameraForwardVector * CameraInterpDistance +
-			CameraUpVector * CameraInterpElevation;
-}
+	float LookUpScaleFactor{};
 
-void AShooterCharacter::GetPickupItem(AItem* Item)
-{
-	auto Weapon = Cast<AWeapon>(Item);
-	if (Weapon)
+	if (bAiming)
 	{
-		SwapWeapon(Weapon);
+		LookUpScaleFactor = MouseAimingLookUpRate;
 	}
-}
-
-void AShooterCharacter::StartCrosshairBulletFire()
-{
-	bFiringBullet = true;
-
-	GetWorldTimerManager().SetTimer(
-		CrosshairShootTimer,
-		this,
-		&AShooterCharacter::FinishCrosshairBulletFire,
-		ShootTimeDuration);
-}
-
-
-void AShooterCharacter::FinishCrosshairBulletFire()
-{
-	bFiringBullet = false;
-
-	GetWorldTimerManager().ClearTimer(CrosshairShootTimer);
-}
-
-void AShooterCharacter::FireWeapon()
-{
-	if(!EquippedWeapon) return;
-	
-	if (FireSound)
+	else
 	{
-		UGameplayStatics::PlaySound2D(this, FireSound);
+		LookUpScaleFactor = MouseHipLookUpRate;
 	}
 
-	const USkeletalMeshSocket* BarrelSocket = EquippedWeapon->GetItemMesh()->GetSocketByName("BarrelSocket");
-	if (BarrelSocket)
-	{
-		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh());
-
-		if (MuzzleFlash)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
-		}
-
-		FVector BeamEnd;
-		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
-		if (bBeamEnd)
-		{
-			// Spawn impact particles after updating BeamEndPoint
-			if (ImpactParticles)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEnd);
-			}
-		}
-		
-		if (BeamParticles)
-		{
-			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
-				GetWorld(), BeamParticles, SocketTransform);
-			if (Beam)
-			{
-				Beam->SetVectorParameter(FName("Target"), BeamEnd);
-			}
-		}
-		
-
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && HipFireMontage)
-		{
-			AnimInstance->Montage_Play(HipFireMontage);
-			AnimInstance->Montage_JumpToSection(FName("StartFire"));
-		}
-
-		//Start bullet fire timer for crosshairs
-		StartCrosshairBulletFire();
-
-		if (EquippedWeapon)
-		{
-			// Subtract 1 from Weapon's Ammo
-			EquippedWeapon->DecrementAmmo();
-		}
-	}
-}
-
-void AShooterCharacter::FireButtonPressed()
-{
-	if (WeaponHasAmmo())
-	{
-		bFireButtonPressed = true;
-
-		StartFireTimer();
-	}
-}
-
-void AShooterCharacter::FireButtonReleased()
-{
-	bFireButtonPressed = false;
-}
-
-void AShooterCharacter::StartFireTimer()
-{
-	if (bShouldFire)
-	{
-		FireWeapon();
-
-		bShouldFire = false;
-
-		GetWorldTimerManager().SetTimer(AutoFireTimer, this, &AShooterCharacter::AutoFireReset, AutomaticFireRate);
-	}
-}
-
-void AShooterCharacter::AutoFireReset()
-{
-	if (WeaponHasAmmo())
-	{
-		bShouldFire = true;
-
-		if (bFireButtonPressed)
-		{
-			StartFireTimer();
-		}
-	}
-}
-
-bool AShooterCharacter::TraceUnderCrosshairs(
-	FHitResult& OutHitResult,
-	FVector& OutHitLocation)
-{
-	//Get current size of viewport
-	FVector2D ViewportSize;
-	if (GEngine && GEngine->GameViewport)
-	{
-		GEngine->GameViewport->GetViewportSize(ViewportSize);
-	}
-
-	//Get screen space location of crosshair
-	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-	//CrosshairLocation.Y -= 50.f;
-	FVector CrosshairWorldPosition;
-	FVector CrosshairWorldDirection;
-
-	//Get world location and direction of crosshair
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-		UGameplayStatics::GetPlayerController(this, 0),
-		CrosshairLocation,
-		CrosshairWorldPosition,
-		CrosshairWorldDirection);
-
-	if (bScreenToWorld)
-	{
-		// Trace from crosshair world location outward
-		const FVector Start{CrosshairWorldPosition};
-		const FVector End{Start + CrosshairWorldDirection * 50'000.f};
-		OutHitLocation = End;
-		GetWorld()->LineTraceSingleByChannel(
-			OutHitResult,
-			Start,
-			End,
-			ECC_Visibility);
-		if (OutHitResult.bBlockingHit)
-		{
-			OutHitLocation = OutHitResult.Location;
-			return true;
-		}
-	}
-	return false;
+	AddControllerPitchInput(Value * LookUpScaleFactor);
 }
 
 // Called to bind functionality to input
