@@ -285,6 +285,27 @@ bool AShooterCharacter::CarryingAmmo()
 	return false;
 }
 
+void AShooterCharacter::GrabClip()
+{
+	if (!EquippedWeapon) return;
+
+	// Index for the clip bone index of the Equipped Weapon
+	const int32 ClipBoneIndex { EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName()) };
+
+	// Store the transform of the clip
+	ClipTransform = EquippedWeapon->GetItemMesh()->GetBoneTransform(ClipBoneIndex);
+
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
+	HandSceneComponent->AttachToComponent(GetMesh(), AttachmentRules, "Hand_L");
+	HandSceneComponent->SetWorldTransform(ClipTransform);
+	EquippedWeapon->SetMovingClip(true);
+}
+
+void AShooterCharacter::ReplaceClip()
+{
+	EquippedWeapon->SetMovingClip(false);
+}
+
 void AShooterCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem)
