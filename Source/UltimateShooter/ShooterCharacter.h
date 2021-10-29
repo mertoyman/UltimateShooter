@@ -338,16 +338,15 @@ private:
 public:
 	/* Return CameraBoom subobject*/
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	
 	/* Return FollowCamera subobject*/
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
 	FORCEINLINE bool GetAiming() const { return bAiming; }
+	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
+	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
 
-	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 
 	/* Adds/subtracts to/from OverlappedItemCount and updates bShouldTraceForItems */
 	void IncrementOverlappedItemCount(int8 Amount);

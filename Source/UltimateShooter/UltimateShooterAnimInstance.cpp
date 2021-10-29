@@ -16,7 +16,9 @@ LastMovementOffsetYaw(0.f),
 bAiming(false),
 CharacterYaw(0.f),
 CharacterYawLastFrame(0.f),
-RootYawOffset(0.f)
+RootYawOffset(0.f),
+Pitch(0.f),
+bReloading(false)
 
 {
 }
@@ -29,6 +31,8 @@ void UUltimateShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 	}
 	else
 	{
+		bReloading = ShooterCharacter->GetCombatState() == ECombatState::ECS_Reloading;
+		
 		//Get the lateral speed of the character from velocity
 		FVector Velocity { ShooterCharacter->GetVelocity() };
 		Velocity.Z = 0;
@@ -62,6 +66,9 @@ void UUltimateShooterAnimInstance::NativeInitializeAnimation()
 void UUltimateShooterAnimInstance::TurnInPlace()
 {
 	if (!ShooterCharacter) return;
+
+	Pitch = ShooterCharacter->GetBaseAimRotation().Pitch;
+	
 	if(Speed > 0 )
 	{
 		// Dont want to turn in place; Character moving
