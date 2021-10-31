@@ -19,7 +19,10 @@ TIPCharacterYawLastFrame(0.f),
 RootYawOffset(0.f),
 Pitch(0.f),
 bReloading(false),
-OffsetState(EOffsetState::EOS_Hip)
+OffsetState(EOffsetState::EOS_Hip),
+CharacterRotation(FRotator(0.f)),
+CharacterRotationLastFrame((FRotator(0.f))),
+YawDelta(0.f)
 {
 }
 
@@ -131,10 +134,12 @@ void UUltimateShooterAnimInstance::Lean(float DeltaTime)
 {
 	if (!ShooterCharacter) return;
 	
-	CharacterYawLastFrame = CharacterYaw;
-	CharacterYaw = ShooterCharacter->GetActorRotation().Yaw;
+	CharacterRotationLastFrame = CharacterRotation;
+	CharacterRotation = ShooterCharacter->GetActorRotation();
 
-	const float Target { (CharacterYaw - CharacterYawLastFrame) / DeltaTime };
+	const FRotator Delta { UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame)};
+
+	const float Target { Delta.Yaw / DeltaTime };
 
 	const float Interp { FMath::FInterpTo(YawDelta, Target, DeltaTime, 6.f) };
 
@@ -147,5 +152,13 @@ void UUltimateShooterAnimInstance::Lean(float DeltaTime)
 			-1,
 			FColor::Cyan,
 			FString::Printf(TEXT("YawDelta: %f"), YawDelta));
+
+		GEngine->AddOnScreenDebugMessage(
+			2,
+			-1,
+			FColor::Cyan,
+			FString::Printf(TEXT("Delta.Yaw: %f"), Delta.Yaw));
 	}
+
+	
 }
