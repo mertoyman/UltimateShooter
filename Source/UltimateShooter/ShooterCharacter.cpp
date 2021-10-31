@@ -61,7 +61,8 @@ AShooterCharacter::AShooterCharacter() :
 	Starting9mmAmmo(75),
 	StartingARAmmo(120),
 	//Combat variables
-	CombatState(ECombatState::ECS_Unoccupied)
+	CombatState(ECombatState::ECS_Unoccupied),
+	bCrouching(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -104,7 +105,7 @@ void AShooterCharacter::BeginPlay()
 	FVector IntepLocation = GetCameraInterpLocation();
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *IntepLocation.ToString());
-	
+
 	// Spawn the default weapon and equip it
 	EquipWeapon(SpawnDefaultWeapon());
 
@@ -127,7 +128,6 @@ void AShooterCharacter::Tick(float DeltaTime)
 
 	// Check OverlappedItemCount, then trace for items
 	TraceForItems();
-	
 }
 
 bool AShooterCharacter::TraceUnderCrosshairs(
@@ -205,7 +205,7 @@ void AShooterCharacter::TraceForItems()
 			TraceHitItemLastFrame = TraceHitItem;
 		}
 	}
-	else if(TraceHitItemLastFrame)
+	else if (TraceHitItemLastFrame)
 	{
 		//No longer overlapping any items
 		TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
@@ -246,7 +246,7 @@ void AShooterCharacter::DropWeapon()
 {
 	if (EquippedWeapon)
 	{
-		const FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true );
+		const FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 		EquippedWeapon->GetItemMesh()->DetachFromComponent(DetachmentTransformRules);
 		EquippedWeapon->SetItemState(EItemState::EIS_Falling);
 		EquippedWeapon->ThrowWeapon();
@@ -257,7 +257,6 @@ void AShooterCharacter::SwapWeapon(AWeapon* WeaponToSwap)
 {
 	DropWeapon();
 	EquipWeapon(WeaponToSwap);
-	 
 }
 
 void AShooterCharacter::InitializeAmmoMap()
@@ -271,7 +270,6 @@ bool AShooterCharacter::WeaponHasAmmo()
 	if (!EquippedWeapon) return nullptr;
 
 	return EquippedWeapon->GetAmmo() > 0;
-	
 }
 
 bool AShooterCharacter::CarryingAmmo()
@@ -280,7 +278,7 @@ bool AShooterCharacter::CarryingAmmo()
 
 	const auto AmmoType = EquippedWeapon->GetAmmoType();
 
-	if(AmmoMap.Contains(AmmoType))
+	if (AmmoMap.Contains(AmmoType))
 	{
 		return AmmoMap[AmmoType] > 0;
 	}
@@ -291,10 +289,10 @@ bool AShooterCharacter::CarryingAmmo()
 void AShooterCharacter::GrabClip()
 {
 	if (!EquippedWeapon) return;
-	if(!HandSceneComponent) return;
+	if (!HandSceneComponent) return;
 
 	// Index for the clip bone index of the Equipped Weapon
-	const int32 ClipBoneIndex { EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName()) };
+	const int32 ClipBoneIndex{EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName())};
 
 	// Store the transform of the clip
 	ClipTransform = EquippedWeapon->GetItemMesh()->GetBoneTransform(ClipBoneIndex);
@@ -308,6 +306,15 @@ void AShooterCharacter::GrabClip()
 void AShooterCharacter::ReplaceClip()
 {
 	EquippedWeapon->SetMovingClip(false);
+}
+
+void AShooterCharacter::CrouchButtonPressed()
+{
+	if(!GetCharacterMovement()->IsFalling())
+	{
+		// We are toggling bCrouching
+		bCrouching = !bCrouching;
+	}
 }
 
 void AShooterCharacter::SelectButtonPressed()
@@ -324,7 +331,6 @@ void AShooterCharacter::SelectButtonPressed()
 
 void AShooterCharacter::SelectButtonReleased()
 {
-	
 }
 
 void AShooterCharacter::ReloadButtonPressed()
@@ -334,14 +340,14 @@ void AShooterCharacter::ReloadButtonPressed()
 
 void AShooterCharacter::ReloadWeapon()
 {
-	if(CombatState != ECombatState::ECS_Unoccupied) return;
-	if(!EquippedWeapon) return;
+	if (CombatState != ECombatState::ECS_Unoccupied) return;
+	if (!EquippedWeapon) return;
 
 	// Do we have ammo of the correct type?
 	if (CarryingAmmo() && !EquippedWeapon->ClipIsFull())
 	{
 		CombatState = ECombatState::ECS_Reloading;
-		
+
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance && ReloadMontage)
 		{
@@ -359,7 +365,7 @@ void AShooterCharacter::FinishReloading()
 	if (!EquippedWeapon) return;
 
 	const auto AmmoType = EquippedWeapon->GetAmmoType();
-	
+
 	// Update the AmmoMap
 	if (AmmoMap.Contains(AmmoType))
 	{
@@ -436,13 +442,13 @@ void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
 
 FVector AShooterCharacter::GetCameraInterpLocation()
 {
-	const FVector CameraWorldLocation { FollowCamera->GetComponentLocation() };
-	const FVector CameraForwardVector { FollowCamera->GetForwardVector() };
-	const FVector CameraUpVector { FollowCamera->GetUpVector() };
+	const FVector CameraWorldLocation{FollowCamera->GetComponentLocation()};
+	const FVector CameraForwardVector{FollowCamera->GetForwardVector()};
+	const FVector CameraUpVector{FollowCamera->GetUpVector()};
 	// Desired location
 	return CameraWorldLocation +
-			CameraForwardVector * CameraInterpDistance +
-			CameraUpVector * CameraInterpElevation;
+	CameraForwardVector * CameraInterpDistance +
+	CameraUpVector * CameraInterpElevation;
 }
 
 void AShooterCharacter::GetPickupItem(AItem* Item)
@@ -451,7 +457,7 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 	{
 		UGameplayStatics::PlaySound2D(this, Item->GetEquipSound());
 	}
-	
+
 	const auto Weapon = Cast<AWeapon>(Item);
 	if (Weapon)
 	{
@@ -486,36 +492,36 @@ void AShooterCharacter::PlayFireSound()
 void AShooterCharacter::SendBullet()
 {
 	const USkeletalMeshSocket* BarrelSocket = EquippedWeapon->GetItemMesh()->GetSocketByName("BarrelSocket");
-		if (BarrelSocket)
+	if (BarrelSocket)
+	{
+		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh());
+
+		if (MuzzleFlash)
 		{
-			const FTransform SocketTransform = BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh());
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+		}
 
-			if (MuzzleFlash)
+		FVector BeamEnd;
+		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
+		if (bBeamEnd)
+		{
+			// Spawn impact particles after updating BeamEndPoint
+			if (ImpactParticles)
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
-			}
-
-			FVector BeamEnd;
-			bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
-			if (bBeamEnd)
-			{
-				// Spawn impact particles after updating BeamEndPoint
-				if (ImpactParticles)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEnd);
-				}
-			}
-		
-			if (BeamParticles)
-			{
-				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(), BeamParticles, SocketTransform);
-				if (Beam)
-				{
-					Beam->SetVectorParameter(FName("Target"), BeamEnd);
-				}
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEnd);
 			}
 		}
+
+		if (BeamParticles)
+		{
+			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(), BeamParticles, SocketTransform);
+			if (Beam)
+			{
+				Beam->SetVectorParameter(FName("Target"), BeamEnd);
+			}
+		}
+	}
 }
 
 void AShooterCharacter::PlayHipFireMontage()
@@ -531,11 +537,11 @@ void AShooterCharacter::PlayHipFireMontage()
 
 void AShooterCharacter::FireWeapon()
 {
-	if(!EquippedWeapon) return;
+	if (!EquippedWeapon) return;
 
-	if(CombatState != ECombatState::ECS_Unoccupied) return;
+	if (CombatState != ECombatState::ECS_Unoccupied) return;
 
-	if(WeaponHasAmmo())
+	if (WeaponHasAmmo())
 	{
 		PlayFireSound();
 		SendBullet();
@@ -545,21 +551,19 @@ void AShooterCharacter::FireWeapon()
 
 		StartFireTimer();
 	}
-	
-	
 }
 
 void AShooterCharacter::StartFireTimer()
 {
 	CombatState = ECombatState::ECS_FireTimerInProgress;
-	
+
 	GetWorldTimerManager().SetTimer(AutoFireTimer, this, &AShooterCharacter::AutoFireReset, AutomaticFireRate);
 }
 
 void AShooterCharacter::AutoFireReset()
 {
 	CombatState = ECombatState::ECS_Unoccupied;
-	
+
 	if (WeaponHasAmmo())
 	{
 		if (bFireButtonPressed)
@@ -607,64 +611,65 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 
 	// Calculate crosshair in air factor
 	if (GetCharacterMovement()->IsFalling()) // Character is in air
-		{
+	{
 		//Spread the crosshairs slowly while in air
 		CrosshairInAirFactor = FMath::FInterpTo(
 			CrosshairInAirFactor,
 			2.25f,
 			DeltaTime,
 			2.25f);
-		}
+	}
 	else // Character is on the ground
-		{
+	{
 		// Shrink the crosshair rapidly while on the ground
 		CrosshairInAirFactor = FMath::FInterpTo(
 			CrosshairInAirFactor,
 			0.f,
 			DeltaTime,
 			30.f);
-		}
+	}
 
 	// Calculate crosshair aim factor
 	if (bAiming) //Are we aiming?
-		{
+	{
 		// Shrink crosshairs rapidly while aiming
 		CrosshairAimFactor = FMath::FInterpTo(
 			CrosshairAimFactor,
 			.6f,
 			DeltaTime,
 			30.f);
-		}
+	}
 	else // Not aiming
-		{
+	{
 		// Spread crosshairs back to normal very quickly
 		CrosshairAimFactor = FMath::FInterpTo(
 			CrosshairAimFactor,
 			0.f,
 			DeltaTime,
 			30.f);
-		}
+	}
 
 	if (bFiringBullet) // Are we firing bullet?
-		{
+	{
 		// Spread crosshairs rapidly while firing
 		CrosshairShootingFactor = FMath::FInterpTo(
 			CrosshairShootingFactor,
 			.3f,
 			DeltaTime,
 			60.f);
-		}
+	}
 	else // Not firing
-		{
+	{
 		// Shrink crosshairs rapidly while aiming
 		CrosshairShootingFactor = FMath::FInterpTo(
 			CrosshairShootingFactor,
 			0.f,
 			DeltaTime,
 			60.f);
-		}
+	}
 
-	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
+	CrosshairSpreadMultiplier = .5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor +
+	CrosshairShootingFactor;
 }
 
 float AShooterCharacter::GetCrosshairSpreadMultiplier() const
@@ -803,4 +808,5 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("DropWeapon", IE_Pressed, this, &AShooterCharacter::SelectButtonPressed);
 	PlayerInputComponent->BindAction("DropWeapon", IE_Released, this, &AShooterCharacter::SelectButtonReleased);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterCharacter::ReloadButtonPressed);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AShooterCharacter::CrouchButtonPressed);
 }
