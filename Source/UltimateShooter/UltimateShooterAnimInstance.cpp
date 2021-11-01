@@ -134,8 +134,23 @@ void UUltimateShooterAnimInstance::TurnInPlace()
 		{
 			bTurningInPlace = false;
 		}
-
-		if (bTurningInPlace)
+	}
+	
+	// Set the Recoil Weight
+	if (bTurningInPlace)
+	{
+		if (bReloading)
+		{
+			RecoilWeight = 1.f;
+		}
+		else
+		{
+			RecoilWeight = 0.f;
+		}
+	}
+	else // not turning in place
+	{
+		if (bCrouching)
 		{
 			if (bReloading)
 			{
@@ -143,32 +158,18 @@ void UUltimateShooterAnimInstance::TurnInPlace()
 			}
 			else
 			{
-				RecoilWeight = 0.f;
+				RecoilWeight = .1f;
 			}
 		}
-		else // not turning in place
+		else
 		{
-			if (bCrouching)
+			if (bAiming || bReloading)
 			{
-				if (bReloading)
-				{
-					RecoilWeight = 1.f;
-				}
-				else
-				{
-					RecoilWeight = .1f;
-				}
+				RecoilWeight = 1.f;
 			}
 			else
 			{
-				if (bAiming || bReloading)
-				{
-					RecoilWeight = 1.f;
-				}
-				else
-				{
-					RecoilWeight = .5f;
-				}
+				RecoilWeight = .5f;
 			}
 		}
 	}
