@@ -740,11 +740,16 @@ float AShooterCharacter::GetCrosshairSpreadMultiplier() const
 void AShooterCharacter::AimingButtonPressed()
 {
 	bAiming = true;
+	GetCharacterMovement()->MaxWalkSpeed = CrouchMovementSpeed;
 }
 
 void AShooterCharacter::AimingButtonReleased()
 {
 	bAiming = false;
+	if (!bCrouching)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+	}
 }
 
 void AShooterCharacter::SetCameraFOV(float DeltaTime)
