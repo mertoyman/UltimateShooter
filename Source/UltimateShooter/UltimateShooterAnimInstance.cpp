@@ -22,7 +22,8 @@ bReloading(false),
 OffsetState(EOffsetState::EOS_Hip),
 CharacterRotation(FRotator(0.f)),
 CharacterRotationLastFrame((FRotator(0.f))),
-YawDelta(0.f)
+YawDelta(0.f),
+RecoilWeight(1.f)
 {
 }
 
@@ -114,6 +115,7 @@ void UUltimateShooterAnimInstance::TurnInPlace()
 		const float Turning{ GetCurveValue("Turning") };
 		if (Turning > 0)
 		{
+			bTurningInPlace = true;
 			RotationCurveLastFrame = RotationCurve;
 			RotationCurve = GetCurveValue("Rotation");
 			const float DeltaRotation { RotationCurve - RotationCurveLastFrame };
@@ -126,6 +128,47 @@ void UUltimateShooterAnimInstance::TurnInPlace()
 			{
 				const float YawExcess{ ABSRootYawOffset - 90.f };
 				RootYawOffset > 0 ? RootYawOffset -= YawExcess : RootYawOffset += YawExcess;
+			}
+		}
+		else
+		{
+			bTurningInPlace = false;
+		}
+
+		if (bTurningInPlace)
+		{
+			if (bReloading)
+			{
+				RecoilWeight = 1.f;
+			}
+			else
+			{
+				RecoilWeight = 0.f;
+			}
+		}
+		else // not turning in place
+		{
+			if (bCrouching)
+			{
+				if (bReloading)
+				{
+					RecoilWeight = 1.f;
+				}
+				else
+				{
+					RecoilWeight = .1f;
+				}
+			}
+			else
+			{
+				if (bAiming || bReloading)
+				{
+					RecoilWeight = 1.f;
+				}
+				else
+				{
+					RecoilWeight = .5f;
+				}
 			}
 		}
 	}
