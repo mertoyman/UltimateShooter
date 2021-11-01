@@ -69,7 +69,8 @@ AShooterCharacter::AShooterCharacter() :
 	StandingCapsuleHalfHeight(88.f),
 	CrouchingCapsuleHalfHeight(44.f),
 	BaseGroundFriction(2.f),
-	CrouchingGroundFriction(10000.f)
+	CrouchingGroundFriction(100.f),
+	bAimingButtonPressed(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -377,6 +378,7 @@ void AShooterCharacter::InterpCapsuleHalfHeight(float DeltaTime)
 	GetCapsuleComponent()->SetCapsuleHalfHeight(InterpHalfHeight);
 }
 
+
 void AShooterCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem)
@@ -403,11 +405,17 @@ void AShooterCharacter::ReloadWeapon()
 	if (CombatState != ECombatState::ECS_Unoccupied) return;
 	if (!EquippedWeapon) return;
 
-	// Do we have ammo of the correct type?
-	if (CarryingAmmo() && !EquippedWeapon->ClipIsFull())
-	{
-		CombatState = ECombatState::ECS_Reloading;
 
+	// Do we have ammo of the correct type?
+	if (CarryingAmmo() && !EquippedWeapon->ClipIsFull() )
+	{
+		if (bAiming)
+		{
+			StopAiming();
+		}
+
+		CombatState = ECombatState::ECS_Reloading;
+		
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance && ReloadMontage)
 		{
@@ -423,6 +431,11 @@ void AShooterCharacter::FinishReloading()
 	CombatState = ECombatState::ECS_Unoccupied;
 
 	if (!EquippedWeapon) return;
+
+	if (bAimingButtonPressed)
+	{
+		Aim();
+	}
 
 	const auto AmmoType = EquippedWeapon->GetAmmoType();
 
@@ -737,19 +750,36 @@ float AShooterCharacter::GetCrosshairSpreadMultiplier() const
 	return CrosshairSpreadMultiplier;
 }
 
-void AShooterCharacter::AimingButtonPressed()
+
+void AShooterCharacter::Aim()
 {
 	bAiming = true;
 	GetCharacterMovement()->MaxWalkSpeed = CrouchMovementSpeed;
 }
 
-void AShooterCharacter::AimingButtonReleased()
+void AShooterCharacter::StopAiming()
 {
 	bAiming = false;
 	if (!bCrouching)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	}
+}
+
+void AShooterCharacter::AimingButtonPressed()
+{
+	bAimingButtonPressed = true;
+
+	if (CombatState != ECombatState::ECS_Reloading)
+	{
+		Aim();
+	}
+}
+
+void AShooterCharacter::AimingButtonReleased()
+{
+	bAimingButtonPressed = false;
+	StopAiming();
 }
 
 void AShooterCharacter::SetCameraFOV(float DeltaTime)
