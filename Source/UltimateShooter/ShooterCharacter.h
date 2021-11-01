@@ -144,6 +144,9 @@ protected:
 
 	virtual void Jump() override;
 
+	/* Interps capsule half height when crouching/standing */
+	void InterpCapsuleHalfHeight(float DeltaTime);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -226,9 +229,11 @@ private:
 	bool bAiming;
 
 	/* Default camera field of view value*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	float CameraDefaultFOV;
 
 	/* Field of view value when zoomed in*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	float CameraZoomedFOV;
 
 	/*Current field of view this frame*/
@@ -350,6 +355,25 @@ private:
 	/* Crouch walking speed */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Movement, meta= (AllowPrivateAccess = true))
 	float CrouchMovementSpeed;
+
+	/* Current half height of the capsule */
+	float CurrentCapsuleHalfHeight;
+
+	/* Half height of the capsule when not crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Movement, meta= (AllowPrivateAccess = true))
+	float StandingCapsuleHalfHeight;
+
+	/* Half height of the capsule when crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Movement, meta= (AllowPrivateAccess = true))
+	float CrouchingCapsuleHalfHeight;
+
+	/* Ground friction while not crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Movement, meta= (AllowPrivateAccess = true))
+	float BaseGroundFriction;
+
+	/* Ground friction while crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Movement, meta= (AllowPrivateAccess = true))
+	float CrouchingGroundFriction;
 
 public:
 	/* Return CameraBoom subobject*/
