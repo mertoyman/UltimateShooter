@@ -150,6 +150,7 @@ protected:
 
 	void StopAiming();
 
+	UFUNCTION(BlueprintCallable)
 	void PickupAmmo(class AAmmo* Ammo);
 
 public:	

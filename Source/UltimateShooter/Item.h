@@ -45,7 +45,7 @@ protected:
 
 	/* Called when overlapping AreaSphere */
 	UFUNCTION()
-	void OnSphereOverlap(
+	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
