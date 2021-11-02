@@ -117,7 +117,6 @@ protected:
 	/* Drop currently equipped Weapon and equips TraceHitItem */ 
 	void SwapWeapon(AWeapon* WeaponToSwap);
 
-
 	void ReloadButtonPressed();
 
 	/* Handle reloading of the weapon */
@@ -150,6 +149,8 @@ protected:
 	void Aim();
 
 	void StopAiming();
+
+	void PickupAmmo(class AAmmo* Ammo);
 
 public:	
 	// Called every frame
