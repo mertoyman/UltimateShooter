@@ -132,11 +132,7 @@ void AShooterCharacter::BeginPlay()
 		CameraDefaultFOV = GetFollowCamera()->FieldOfView;
 		CameraCurrentFOV = CameraDefaultFOV;
 	}
-
-	FVector IntepLocation = GetCameraInterpLocation();
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *IntepLocation.ToString());
-
+	
 	// Spawn the default weapon and equip it
 	EquipWeapon(SpawnDefaultWeapon());
 
@@ -146,7 +142,9 @@ void AShooterCharacter::BeginPlay()
 	InitializeInterpLocations();
 
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
-
+	
+	
+	
 	
 }
 
@@ -537,17 +535,6 @@ void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
 	}
 }
 
-FVector AShooterCharacter::GetCameraInterpLocation()
-{
-	const FVector CameraWorldLocation{FollowCamera->GetComponentLocation()};
-	const FVector CameraForwardVector{FollowCamera->GetForwardVector()};
-	const FVector CameraUpVector{FollowCamera->GetUpVector()};
-	// Desired location
-	return CameraWorldLocation +
-	CameraForwardVector * CameraInterpDistance +
-	CameraUpVector * CameraInterpElevation;
-}
-
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
 	if (Item->GetEquipSound())
@@ -848,6 +835,33 @@ void AShooterCharacter::InitializeInterpLocations()
 	const FInterpLocation InterpLoc6 { InterpComp6, 0 };
 	InterpLocations.Add(InterpLoc6);
 
+	
+}
+
+int32 AShooterCharacter::GetInterpLocationIndex()
+{
+	int32 LowestIndex = 1;
+	int32 LowestCount = INT_MAX;
+
+	for (int32 i = 1; i < InterpLocations.Num(); i++)
+	{
+		if (InterpLocations[i].ItemCount < LowestCount)
+		{
+			LowestIndex = i;
+			LowestCount = InterpLocations[i].ItemCount;
+		}
+	}
+	return LowestIndex;
+}
+
+void AShooterCharacter::IncrementInterpLocItemCount(int32 Index, int32 Amount)
+{
+	if (Amount < -1 || Amount > 1) return;
+
+	if (InterpLocations.Num() >= Index)
+	{
+		InterpLocations[Index].ItemCount += Amount;
+	}
 	
 }
 

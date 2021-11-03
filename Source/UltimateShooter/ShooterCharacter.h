@@ -169,6 +169,7 @@ protected:
 
 	void InitializeInterpLocations();
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -443,7 +444,10 @@ public:
 	/* Adds/subtracts to/from OverlappedItemCount and updates bShouldTraceForItems */
 	void IncrementOverlappedItemCount(int8 Amount);
 
-	FVector GetCameraInterpLocation();
-
 	void GetPickupItem(AItem* Item);
+
+	// Returns the index in InterpL	ocations array with the lowest ItemCount
+	int32 GetInterpLocationIndex();
+
+	 void IncrementInterpLocItemCount(int32 Index, int32 Amount);
 };
