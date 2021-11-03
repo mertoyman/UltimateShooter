@@ -142,7 +142,12 @@ void AShooterCharacter::BeginPlay()
 
 	InitializeAmmoMap();
 
+	// Create FInterpLocation structs for each interp location.Add to array
+	InitializeInterpLocations();
+
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+
+	
 }
 
 // Called every frame
@@ -770,6 +775,16 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	CrosshairShootingFactor;
 }
 
+FInterpLocation AShooterCharacter::GetInterpLocation(int32 Index)
+{
+	if (Index <= InterpLocations.Num())
+	{
+		return InterpLocations[Index];
+	}
+
+	return FInterpLocation(); // return empty location
+}
+
 float AShooterCharacter::GetCrosshairSpreadMultiplier() const
 {
 	return CrosshairSpreadMultiplier;
@@ -813,6 +828,27 @@ void AShooterCharacter::PickupAmmo(class AAmmo* Ammo)
 	}
 
 	Ammo->Destroy();
+}
+
+void AShooterCharacter::InitializeInterpLocations()
+{
+	const FInterpLocation WeaponLocation { WeaponInterpComp, 0 };
+	InterpLocations.Add(WeaponLocation);
+
+	const FInterpLocation InterpLoc1 { InterpComp1, 0 };
+	InterpLocations.Add(InterpLoc1);
+	const FInterpLocation InterpLoc2 { InterpComp2, 0 };
+	InterpLocations.Add(InterpLoc2);
+	const FInterpLocation InterpLoc3 { InterpComp3, 0 };
+	InterpLocations.Add(InterpLoc3);
+	const FInterpLocation InterpLoc4 { InterpComp4, 0 };
+	InterpLocations.Add(InterpLoc4);
+	const FInterpLocation InterpLoc5 { InterpComp5, 0 };
+	InterpLocations.Add(InterpLoc5);
+	const FInterpLocation InterpLoc6 { InterpComp6, 0 };
+	InterpLocations.Add(InterpLoc6);
+
+	
 }
 
 void AShooterCharacter::AimingButtonPressed()
