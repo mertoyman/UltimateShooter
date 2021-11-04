@@ -84,6 +84,9 @@ protected:
 
 	/* Get interp location based on the item type */ 
 	FVector GetInterpLocation();
+	
+	void PlayPickupSound();
+
 
 public:	
 	// Called every frame
@@ -192,4 +195,6 @@ public:
 	void SetItemState(EItemState State);
 	/* Called from the AShooterCharacter class */
 	void StartItemCurve(AShooterCharacter* Char);
+
+	void PlayEquipSound();
 };

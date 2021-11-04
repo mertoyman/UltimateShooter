@@ -71,7 +71,12 @@ AShooterCharacter::AShooterCharacter() :
 	CrouchingCapsuleHalfHeight(44.f),
 	BaseGroundFriction(2.f),
 	CrouchingGroundFriction(100.f),
-	bAimingButtonPressed(false)
+	bAimingButtonPressed(false),
+	// Pickup sound timer properties
+	bShouldPlayPickupSound(true),
+	bShouldPlayEquipSound(true),
+	PickupSoundResetTime(.5f),
+	EquipSoundResetTime(.5f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -143,9 +148,6 @@ void AShooterCharacter::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	
-	
-	
-	
 }
 
 // Called every frame
@@ -168,6 +170,7 @@ void AShooterCharacter::Tick(float DeltaTime)
 	// Interpolate the capsule half height based on crouching/standing
 	InterpCapsuleHalfHeight(DeltaTime);
 }
+
 
 bool AShooterCharacter::TraceUnderCrosshairs(
 	FHitResult& OutHitResult,
@@ -537,11 +540,8 @@ void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
 
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
-	if (Item->GetEquipSound())
-	{
-		UGameplayStatics::PlaySound2D(this, Item->GetEquipSound());
-	}
-
+	Item->PlayEquipSound();
+	
 	const auto Weapon = Cast<AWeapon>(Item);
 	if (Weapon)
 	{
@@ -762,6 +762,30 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	CrosshairShootingFactor;
 }
 
+void AShooterCharacter::StartPickupSoundTimer()
+{
+	bShouldPlayPickupSound = false;
+	GetWorldTimerManager().SetTimer(PickupSoundTimer, this, &AShooterCharacter::ResetPickupSoundTimer, PickupSoundResetTime);
+}
+
+void AShooterCharacter::StartEquipSoundTimer()
+{
+	bShouldPlayEquipSound = false;
+	GetWorldTimerManager().SetTimer(EquipSoundTimer, this, &AShooterCharacter::ResetEquipSoundTimer, EquipSoundResetTime);
+}
+
+void AShooterCharacter::ResetPickupSoundTimer()
+{
+	bShouldPlayPickupSound = true;
+	GetWorldTimerManager().ClearTimer(EquipSoundTimer);
+}
+
+void AShooterCharacter::ResetEquipSoundTimer()
+{
+	bShouldPlayEquipSound = true;
+	GetWorldTimerManager().ClearTimer(PickupSoundTimer);
+}
+
 FInterpLocation AShooterCharacter::GetInterpLocation(int32 Index)
 {
 	if (Index <= InterpLocations.Num())
@@ -834,8 +858,6 @@ void AShooterCharacter::InitializeInterpLocations()
 	InterpLocations.Add(InterpLoc5);
 	const FInterpLocation InterpLoc6 { InterpComp6, 0 };
 	InterpLocations.Add(InterpLoc6);
-
-	
 }
 
 int32 AShooterCharacter::GetInterpLocationIndex()

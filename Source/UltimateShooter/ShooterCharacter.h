@@ -426,6 +426,24 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta= (AllowPrivateAccess = true))
 	TArray<FInterpLocation> InterpLocations;
 
+	FTimerHandle PickupSoundTimer;
+	FTimerHandle EquipSoundTimer;
+
+	bool bShouldPlayPickupSound;
+	bool bShouldPlayEquipSound;
+
+
+	void ResetPickupSoundTimer();
+	void ResetEquipSoundTimer();
+
+	/* Time to wait before we can play another Pickup Sound */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Items", meta= (AllowPrivateAccess = true))
+	float PickupSoundResetTime;
+
+	/* Time to wait before we can play another Equip Sound */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Items", meta= (AllowPrivateAccess = true))
+	float EquipSoundResetTime;
+
 public:
 	/* Return CameraBoom subobject*/
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -436,6 +454,8 @@ public:
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 	FORCEINLINE bool GetCrouching() const { return bCrouching; }
 	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
+	FORCEINLINE bool GetShouldPlayPickupSound() const { return bShouldPlayPickupSound; }
+	FORCEINLINE bool GetShouldPlayEquipSound() const { return bShouldPlayEquipSound; }
 	
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
@@ -449,5 +469,8 @@ public:
 	// Returns the index in InterpL	ocations array with the lowest ItemCount
 	int32 GetInterpLocationIndex();
 
-	 void IncrementInterpLocItemCount(int32 Index, int32 Amount);
+	void IncrementInterpLocItemCount(int32 Index, int32 Amount);
+
+	void StartPickupSoundTimer();
+	void StartEquipSoundTimer();
 };
