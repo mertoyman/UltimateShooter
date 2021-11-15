@@ -89,6 +89,8 @@ protected:
 
 	virtual void InitializeCustomDepth();
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 
 public:	
 	// Called every frame
@@ -183,6 +185,18 @@ private:
 	/* Index of the Interp location this item is interping to */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item Properties", meta= (AllowPrivateAccess=true))
 	int32 InterpLocIndex;
+
+	/* Index of the material we'd like to change at runtime */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Properties", meta= (AllowPrivateAccess=true))
+	int32 MaterialIndex;
+
+	/* Dynamic instance we can change t runtime */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item Properties", meta= (AllowPrivateAccess=true))
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
+
+	/* Material instance used with the Dynamic Material Instance */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Properties", meta= (AllowPrivateAccess=true))
+	UMaterialInstance* MaterialInstance;
 
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
