@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "EnvironmentQuery/EnvQueryGenerator.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 
@@ -64,6 +65,9 @@ void AItem::BeginPlay()
 
 	// Set Item properties based on ItemState
 	SetItemProperties(ItemState);
+
+	// Set custom depth to disabled
+	InitializeCustomDepth();
 }
 
 // Called every frame
@@ -301,6 +305,21 @@ void AItem::PlayPickupSound()
 		Character->StartPickupSoundTimer();
 		UGameplayStatics::PlaySound2D(this, PickupSound);
 	}
+}
+
+void AItem::EnableCustomDepth()
+{
+	ItemMesh->SetRenderCustomDepth(true);
+}
+
+void AItem::DisableCustomDepth()
+{
+	ItemMesh->SetRenderCustomDepth(false);
+}
+
+void AItem::InitializeCustomDepth()
+{
+	DisableCustomDepth();
 }
 
 void AItem::PlayEquipSound()

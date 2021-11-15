@@ -87,6 +87,8 @@ protected:
 	
 	void PlayPickupSound();
 
+	virtual void InitializeCustomDepth();
+
 
 public:	
 	// Called every frame
@@ -197,4 +199,8 @@ public:
 	void StartItemCurve(AShooterCharacter* Char);
 
 	void PlayEquipSound();
+
+	virtual void EnableCustomDepth();
+
+	virtual void DisableCustomDepth();
 };
