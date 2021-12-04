@@ -228,7 +228,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Item Properties", meta= (AllowPrivateAccess=true))
 	float FresnelExponent;
 
-	UPROPERTY(VisibleAnywhere, Category="Item Properties", meta= (AllowPrivateAccess=true))
+	UPROPERTY(VisibleAnywhere, Category="Item Properties", meta= (AlnlowPrivateAccess=true))
 	float FresnelReflectFraction;
 
 	/* Background for this item in the Inventory */
@@ -238,6 +238,10 @@ private:
 	/* Icon for this item in the Inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta= (AllowPrivateAccess=true))
 	UTexture2D* IconItem;
+
+	/* Icon for this item in the Inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta= (AllowPrivateAccess=true))
+	UTexture2D* IconAmmo;
 
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
