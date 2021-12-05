@@ -222,11 +222,11 @@ void AItem::SetItemProperties(EItemState State)
 			break;
 
 		case EItemState::EIS_PickedUp:
+			PickupWidget->SetVisibility(false);
 			// Set mesh properties
 			ItemMesh->SetSimulatePhysics(false);
 			ItemMesh->SetVisibility(false);
 			ItemMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-			ItemMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 			ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			// Set AreaSphere properties
 			AreaSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -248,7 +248,6 @@ void AItem::FinishInterping()
 		// Subtract 1 from the ItemCount of the interp location struct
 		Character->IncrementInterpLocItemCount(InterpLocIndex, -1);
 		Character->GetPickupItem(this);
-		SetItemState(EItemState::EIS_PickedUp);
 	}
 
 	// Set scale back to normal
