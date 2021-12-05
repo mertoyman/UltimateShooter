@@ -440,6 +440,8 @@ void AShooterCharacter::InterpCapsuleHalfHeight(float DeltaTime)
 
 void AShooterCharacter::SelectButtonPressed()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return;
+	
 	if (TraceHitItem)
 	{
 		TraceHitItem->StartItemCurve(this);
@@ -939,7 +941,9 @@ void AShooterCharacter::FiveKeyPressed()
 
 void AShooterCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex)
 {
-	if((NewItemIndex >= Inventory.Num()) || (CurrentItemIndex == NewItemIndex)) return;
+	if((NewItemIndex >= Inventory.Num())
+		|| (CurrentItemIndex == NewItemIndex)
+		|| (CombatState != ECombatState::ECS_Unoccupied)) return;
 
 	const auto OldEquippedWeapon = EquippedWeapon;
 	const auto NewWeapon = Cast<AWeapon>(Inventory[NewItemIndex]);
