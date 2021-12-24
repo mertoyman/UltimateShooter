@@ -184,6 +184,10 @@ protected:
 
 	int32 GetEmptyInventorySlot();
 
+	void HighlightInventorySlot();
+
+	void UnHighlightInventorySlot();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -479,6 +483,10 @@ private:
 	/* Delegate for sending slot information for playing the icon animation */
 	UPROPERTY(BlueprintAssignable, Category="Delegates", meta= (AllowPrivateAccess = true))
 	FHighlightIconDelegate HighlightIconDelegate;
+
+	/* The index for currently highlighted slot */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta= (AllowPrivateAccess = true))
+	int32 HighlightedSlot;
 
 public:
 	/* Return CameraBoom subobject*/
