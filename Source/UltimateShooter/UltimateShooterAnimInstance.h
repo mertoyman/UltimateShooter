@@ -115,5 +115,11 @@ private:
 	/* True when turning in place */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat", meta = (AllowPrivateAccess = true))
 	bool bTurningInPlace;
+
+	/* True when equipping item */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat", meta = (AllowPrivateAccess = true))
+	bool bEquipping;
+
+	
 };
 	
