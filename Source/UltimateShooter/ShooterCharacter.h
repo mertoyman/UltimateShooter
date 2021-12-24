@@ -125,7 +125,7 @@ protected:
 	void SelectButtonReleased();
 	
 	/* Takes a weapon and attaches it to the mesh */
-	void EquipWeapon(class AWeapon* WeaponToEquip);
+	void EquipWeapon(class AWeapon* WeaponToEquip, bool bSwapping = false);
 
 	/* Drop weapon and let it fall to the ground */
 
