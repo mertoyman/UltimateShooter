@@ -394,7 +394,38 @@ void AItem::OnConstruction(const FTransform& movie_scene_blends)
 	UDataTable* RarityTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *RarityTablePath));
 	if (RarityTableObject)
 	{
-		
+		FItemRarityTable* RarityRow = nullptr;
+		switch (ItemRarity)
+		{
+			case EItemRarity::EIR_Damaged:
+				RarityRow = RarityTableObject->FindRow<FItemRarityTable>("Damaged", "");
+				break;
+
+			case EItemRarity::EIR_Common:
+				RarityRow = RarityTableObject->FindRow<FItemRarityTable>("Common", "");
+				break;
+
+			case EItemRarity::EIR_Uncommon:
+				RarityRow = RarityTableObject->FindRow<FItemRarityTable>("Uncommon", "");
+				break;
+
+			case EItemRarity::EIR_Rare:
+				RarityRow = RarityTableObject->FindRow<FItemRarityTable>("Rare", "");
+				break;
+
+			case EItemRarity::EIR_Legendary:
+				RarityRow = RarityTableObject->FindRow<FItemRarityTable>("Legendary", "");
+				break;
+		}
+
+		if (RarityRow)
+		{
+			GlowColor = RarityRow->GlowColor;
+			LightColor = RarityRow->LightColor;
+			DarkColor = RarityRow->DarkColor;
+			NumberOfStars = RarityRow->NumberOfStars;
+			IconBackground = RarityRow->IconBackground;
+		}
 	}
 	
 }
