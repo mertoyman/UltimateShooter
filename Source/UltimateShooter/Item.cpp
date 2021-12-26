@@ -377,14 +377,11 @@ void AItem::InitializeCustomDepth()
 	DisableCustomDepth();
 }
 
-void AItem::OnConstruction(const FTransform& movie_scene_blends)
+void AItem::OnConstruction(const FTransform& Transform)
 {
 
-
-	// Load the data in the Item Rarity Data Table
-
-	//Path to the Item Rarity Data Table
-	FString RarityTablePath(TEXT("DataTable'/Game/_Game/DataTables/ItemRarityDataTable.ItemRarityDataTable'"));
+	Super::OnConstruction(Transform);
+	const FString RarityTablePath(TEXT("DataTable'/Game/_Game/DataTables/ItemRarityDataTable.ItemRarityDataTable'"));
 	UDataTable* RarityTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *RarityTablePath));
 	if (RarityTableObject)
 	{

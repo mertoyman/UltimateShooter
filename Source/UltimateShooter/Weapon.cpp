@@ -81,5 +81,44 @@ void AWeapon::StopFalling()
 	StartPulseTimer(); 
 }
 
+void AWeapon::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	// Load the data in the Item Rarity Data Table
+
+	//Path to the Item Rarity Data Table
+	const FString WeaponTablePath(TEXT("DataTable'/Game/_Game/DataTables/WeaponDataTable.WeaponDataTable'"));
+	UDataTable* WeaponTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *WeaponTablePath));
+
+	if (WeaponTableObject)
+	{
+		FWeaponDataTable* WeaponRow = nullptr;
+		switch (WeaponType)
+		{
+			case EWeaponType::EWT_SubmachineGun:
+				WeaponRow = WeaponTableObject->FindRow<FWeaponDataTable>("SubmachineGun", "");
+			break;
+
+			case EItemRarity::EIR_Common:
+				WeaponRow = WeaponTableObject->FindRow<FWeaponDataTable>("AssaultRifle", "");
+			break;
+			default: ;
+		}
+
+		if (WeaponRow)
+		{
+			AmmoType = WeaponRow->AmmoType;
+			Ammo = WeaponRow->WeaponAmmo;
+			MagazineCapacity = WeaponRow->MagazineCapacity;
+			SetPickupSound(WeaponRow->PickupSound);
+			SetEquipSound(WeaponRow->EquipSound);
+			GetItemMesh()->SetSkeletalMesh(WeaponRow->ItemMesh);
+			SetItemName(WeaponRow->ItemName);
+			SetIconItem(WeaponRow->InventoryIcon);
+			SetAmmoIcon(WeaponRow->AmmoIcon);
+		}
+	}
+}
+
 
 
