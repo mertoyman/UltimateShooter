@@ -116,6 +116,8 @@ void AWeapon::OnConstruction(const FTransform& Transform)
 			SetItemName(WeaponRow->ItemName);
 			SetIconItem(WeaponRow->InventoryIcon);
 			SetAmmoIcon(WeaponRow->AmmoIcon);
+			SetClipBoneName(WeaponRow->ClipBoneName);
+			SetReloadMontageSection(WeaponRow->ReloadMontageSection);
 
 			SetMaterialInstance(WeaponRow->MaterialInstance);
 			PreviousMaterialIndex = GetMaterialIndex();

@@ -45,8 +45,12 @@ struct FWeaponDataTable: public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaterialIndex;
-
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ClipBoneName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ReloadMontageSection;
 };
 
 UCLASS()
@@ -111,7 +115,9 @@ public:
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; }
 	FORCEINLINE FName GetReloadMontageSection() const { return ReloadMontageSection; }
+	FORCEINLINE void SetReloadMontageSection(FName Section) { ReloadMontageSection = Section; }
 	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
+	FORCEINLINE void SetClipBoneName(FName Name) { ClipBoneName = Name; }
 	FORCEINLINE void SetMovingClip(const bool Move) { bMovingClip = Move; }
 
 	/* Adds an impulse to the Weapon */
