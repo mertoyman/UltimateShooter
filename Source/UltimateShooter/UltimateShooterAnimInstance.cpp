@@ -23,7 +23,9 @@ OffsetState(EOffsetState::EOS_Hip),
 CharacterRotation(FRotator(0.f)),
 CharacterRotationLastFrame((FRotator(0.f))),
 YawDelta(0.f),
-RecoilWeight(1.f)
+RecoilWeight(1.f),
+EquippedWeaponType(EWeaponType::EWT_DefaultMAX),
+bShouldUseFABRIK(false)
 {
 }
 
@@ -38,6 +40,8 @@ void UUltimateShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		bCrouching = ShooterCharacter->GetCrouching();
 		bReloading = ShooterCharacter->GetCombatState() == ECombatState::ECS_Reloading;
 		bEquipping = ShooterCharacter->GetCombatState() == ECombatState::ECS_Equipping;
+		bShouldUseFABRIK = ShooterCharacter->GetCombatState() == ECombatState::ECS_Unoccupied ||
+			ShooterCharacter->GetCombatState() == ECombatState::ECS_FireTimerInProgress;
 		
 		//Get the lateral speed of the character from velocity
 		FVector Velocity { ShooterCharacter->GetVelocity() };

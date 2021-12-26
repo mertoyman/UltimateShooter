@@ -124,5 +124,9 @@ private:
 	/* Weapon type for the currently equipped weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat", meta = (AllowPrivateAccess = true))
 	EWeaponType EquippedWeaponType;
+
+	/* True when not reloading or equipping */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat", meta = (AllowPrivateAccess = true))
+	bool bShouldUseFABRIK;
 };
 	
