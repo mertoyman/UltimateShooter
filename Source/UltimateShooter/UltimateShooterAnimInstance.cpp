@@ -77,6 +77,13 @@ void UUltimateShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		{
 			OffsetState = EOffsetState::EOS_Hip;
 		}
+
+		//Check if ShooterCharacter has a valid EquippedWeapon
+		if (ShooterCharacter->GetEquippedWeapon())
+		{
+			EquippedWeaponType = ShooterCharacter->GetEquippedWeapon()->GetWeaponType();
+		}
+		
 	}
 	TurnInPlace();
 	Lean(DeltaTime);

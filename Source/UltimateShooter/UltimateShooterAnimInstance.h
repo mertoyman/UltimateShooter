@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "WeaponType.h"
 #include "UltimateShooterAnimInstance.generated.h"
 
 UENUM(BlueprintType)
@@ -120,6 +121,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat", meta = (AllowPrivateAccess = true))
 	bool bEquipping;
 
-	
+	/* Weapon type for the currently equipped weapon */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat", meta = (AllowPrivateAccess = true))
+	EWeaponType EquippedWeaponType;
 };
 	
