@@ -92,43 +92,46 @@ void AWeapon::OnConstruction(const FTransform& Transform)
 
 	if (WeaponTableObject)
 	{
-		FWeaponDataTable* WeaponRow = nullptr;
+		FWeaponDataTable* WeaponDataRow = nullptr;
 		switch (WeaponType)
 		{
 			case EWeaponType::EWT_SubmachineGun:
-				WeaponRow = WeaponTableObject->FindRow<FWeaponDataTable>("SubmachineGun", "");
+				WeaponDataRow = WeaponTableObject->FindRow<FWeaponDataTable>("SubmachineGun", "");
 			break;
 
 			case EItemRarity::EIR_Common:
-				WeaponRow = WeaponTableObject->FindRow<FWeaponDataTable>("AssaultRifle", "");
+				WeaponDataRow = WeaponTableObject->FindRow<FWeaponDataTable>("AssaultRifle", "");
 			break;
 			default: ;
 		}
 
-		if (WeaponRow)
+		if (WeaponDataRow)
 		{
-			AmmoType = WeaponRow->AmmoType;
-			Ammo = WeaponRow->WeaponAmmo;
-			MagazineCapacity = WeaponRow->MagazineCapacity;
-			SetPickupSound(WeaponRow->PickupSound);
-			SetEquipSound(WeaponRow->EquipSound);
-			GetItemMesh()->SetSkeletalMesh(WeaponRow->ItemMesh);
-			SetItemName(WeaponRow->ItemName);
-			SetIconItem(WeaponRow->InventoryIcon);
-			SetAmmoIcon(WeaponRow->AmmoIcon);
-			SetClipBoneName(WeaponRow->ClipBoneName);
-			SetReloadMontageSection(WeaponRow->ReloadMontageSection);
-			GetItemMesh()->SetAnimInstanceClass(WeaponRow->AnimBP);
-			CrosshairsMiddle = WeaponRow->CrosshairsMiddle;
-			CrosshairsRight = WeaponRow->CrosshairsRight;
-			CrosshairsLeft = WeaponRow->CrosshairsLeft;
-			CrosshairsBottom = WeaponRow->CrosshairsBottom;
-			CrosshairsTop = WeaponRow->CrosshairsTop;
+			AmmoType = WeaponDataRow->AmmoType;
+			Ammo = WeaponDataRow->WeaponAmmo;
+			MagazineCapacity = WeaponDataRow->MagazineCapacity;
+			SetPickupSound(WeaponDataRow->PickupSound);
+			SetEquipSound(WeaponDataRow->EquipSound);
+			GetItemMesh()->SetSkeletalMesh(WeaponDataRow->ItemMesh);
+			SetItemName(WeaponDataRow->ItemName);
+			SetIconItem(WeaponDataRow->InventoryIcon);
+			SetAmmoIcon(WeaponDataRow->AmmoIcon);
+			SetClipBoneName(WeaponDataRow->ClipBoneName);
+			SetReloadMontageSection(WeaponDataRow->ReloadMontageSection);
+			GetItemMesh()->SetAnimInstanceClass(WeaponDataRow->AnimBP);
+			CrosshairsMiddle = WeaponDataRow->CrosshairsMiddle;
+			CrosshairsRight = WeaponDataRow->CrosshairsRight;
+			CrosshairsLeft = WeaponDataRow->CrosshairsLeft;
+			CrosshairsBottom = WeaponDataRow->CrosshairsBottom;
+			CrosshairsTop = WeaponDataRow->CrosshairsTop;
+			AutoFireRate = WeaponDataRow->AutoFireRate;
+			MuzzleFlash = WeaponDataRow->MuzzleFlash;
+			FireSound = WeaponDataRow->FireSound;
 
-			SetMaterialInstance(WeaponRow->MaterialInstance);
+			SetMaterialInstance(WeaponDataRow->MaterialInstance);
 			PreviousMaterialIndex = GetMaterialIndex();
 			GetItemMesh()->SetMaterial(PreviousMaterialIndex, nullptr);
-			SetMaterialIndex(WeaponRow->MaterialIndex);
+			SetMaterialIndex(WeaponDataRow->MaterialIndex);
 		}
 
 		if (GetMaterialInstance())
