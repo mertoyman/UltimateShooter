@@ -177,7 +177,10 @@ public:
 	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
 	FORCEINLINE void SetClipBoneName(FName Name) { ClipBoneName = Name; }
 	FORCEINLINE void SetMovingClip(const bool Move) { bMovingClip = Move; }
-
+	FORCEINLINE float GetAutoFireRate() const { return AutoFireRate; }
+	FORCEINLINE UParticleSystem* GetMuzzleFlash() const { return MuzzleFlash; }
+	FORCEINLINE USoundCue* GetFireSound() const { return FireSound; }
+	
 	/* Adds an impulse to the Weapon */
 	void ThrowWeapon();
 
