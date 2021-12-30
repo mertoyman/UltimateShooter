@@ -86,6 +86,11 @@ void AWeapon::OnConstruction(const FTransform& Transform)
 
 			EnableGlowMaterial();
 		}
+
+		if (BoneToHide != FName(""))
+		{
+			GetItemMesh()->HideBoneByName(BoneToHide, PBO_None);
+		}
 	}
 }
 
