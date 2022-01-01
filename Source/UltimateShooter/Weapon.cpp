@@ -14,9 +14,10 @@ AWeapon::AWeapon() :
 	ReloadMontageSection("ReloadSMG"),
 	ClipBoneName(TEXT("smg_clip")),
 	SlideDisplacement(0.f),
-	SlideDisplacementTime(0.1f),
+	SlideDisplacementTime(0.2f),
 	bMovingSlide(false),
-	MaxSlideDisplacement(4.f)
+	MaxSlideDisplacement(4.f),
+	MaxRecoilRotation(20.f)
 {
  	PrimaryActorTick.bCanEverTick = true;
 }
@@ -113,6 +114,17 @@ void AWeapon::FinishMovingSlide()
 	bMovingSlide = false;
 }
 
+void AWeapon::UpdateSlideDisplacement()
+{
+	if (SlideDisplacementCurve && bMovingSlide)
+	{
+		const float ElapsedTime { GetWorldTimerManager().GetTimerElapsed(SlideTimer) };
+		const float CurveValue { SlideDisplacementCurve->GetFloatValue(ElapsedTime) };
+		SlideDisplacement = CurveValue * MaxSlideDisplacement;
+		RecoilRotation = CurveValue * MaxRecoilRotation;
+	}
+}
+
 
 void AWeapon::Tick(float DeltaSeconds)
 {
@@ -124,6 +136,9 @@ void AWeapon::Tick(float DeltaSeconds)
 		const FRotator MeshRotation {0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f};
 		GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
 	}
+
+	// Update slice on pistol
+	UpdateSlideDisplacement();
 }
 
 void AWeapon::ThrowWeapon()

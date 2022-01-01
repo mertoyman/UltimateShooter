@@ -723,7 +723,7 @@ void AShooterCharacter::FireWeapon()
 		{
 			// Start moving slide timer
 			EquippedWeapon->StartSlideTimer();
-			EquippedWeapon
+			
 		}
 	}
 }
