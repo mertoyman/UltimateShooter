@@ -13,7 +13,10 @@ AWeapon::AWeapon() :
 	AmmoType(EAmmoType::EAT_9mm),
 	ReloadMontageSection("ReloadSMG"),
 	ClipBoneName(TEXT("smg_clip")),
-	SlideDisplacement(0.f)
+	SlideDisplacement(0.f),
+	SlideDisplacementTime(0.1f),
+	bMovingSlide(false),
+	MaxSlideDisplacement(4.f)
 {
  	PrimaryActorTick.bCanEverTick = true;
 }
@@ -105,6 +108,10 @@ void AWeapon::BeginPlay()
 	}
 }
 
+void AWeapon::FinishMovingSlide()
+{
+	bMovingSlide = false;
+}
 
 
 void AWeapon::Tick(float DeltaSeconds)
@@ -162,6 +169,18 @@ void AWeapon::ReloadAmmo(int32 Amount)
 bool AWeapon::ClipIsFull()
 {
 	return Ammo >= MagazineCapacity;
+}
+
+void AWeapon::StartSlideTimer()
+{
+	bMovingSlide = true;
+	
+	GetWorldTimerManager().SetTimer(
+		SlideTimer,
+		this,
+		&AWeapon::FinishMovingSlide,
+		SlideDisplacementTime
+		);
 }
 
 void AWeapon::StopFalling()

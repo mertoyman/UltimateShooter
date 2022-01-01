@@ -101,6 +101,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	void FinishMovingSlide();
+
 private:
 	FTimerHandle ThrowWeaponTimer;
 	float ThrowWeaponTime;
@@ -177,8 +179,22 @@ private:
 	float SlideDisplacement;
 
 	/* Curve for the slide displacement */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Pistol", meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Pistol", meta=(AllowPrivateAccess=true))
 	UCurveFloat* SlideDisplacementCurve;
+
+	/* Timer handle for updating SlidePlacement */
+	FTimerHandle SlideTimer;
+
+	/* Time for displacing the slide during pistol fire */
+	float SlideDisplacementTime;
+
+	/* True when moving the pistol slide */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Pistol", , meta=(AllowPrivateAccess=true))
+	bool bMovingSlide;
+
+	/* Max distance for the slide on the pistol */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pistol", meta=(AllowPrivateAccess=true))
+	float MaxSlideDisplacement;
 	
 public:
 
@@ -204,4 +220,6 @@ public:
 	void ReloadAmmo(int32 Amount);
 
 	bool ClipIsFull();
+
+	void StartSlideTimer();
 };
