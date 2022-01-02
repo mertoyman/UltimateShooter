@@ -59,7 +59,7 @@ AShooterCharacter::AShooterCharacter() :
 	CameraInterpDistance(250.f),
 	CameraInterpElevation(65.f),
 	//Starting ammo amounts
-	Starting9mmAmmo(75),
+	Starting9mmAmmo(15),
 	StartingARAmmo(120),
 	//Combat variables
 	CombatState(ECombatState::ECS_Unoccupied),
@@ -741,9 +741,11 @@ void AShooterCharacter::AutoFireReset()
 {
 	CombatState = ECombatState::ECS_Unoccupied;
 
+	if (!EquippedWeapon) return;
+
 	if (WeaponHasAmmo())
 	{
-		if (bFireButtonPressed)
+		if (bFireButtonPressed && EquippedWeapon->GetAutomatic())
 		{
 			FireWeapon();
 		}

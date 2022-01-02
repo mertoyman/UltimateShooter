@@ -81,6 +81,9 @@ struct FWeaponDataTable: public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName BoneToHide;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAutomatic;
 };
 
 UCLASS()
@@ -205,6 +208,10 @@ private:
 	/* Amount that the pistol will rotate during the pistol fire */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Pistol", meta=(AllowPrivateAccess=true))
 	float RecoilRotation;
+
+	/* True for auto gunfire */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	bool bAutomatic;
 	
 public:
 
@@ -220,6 +227,7 @@ public:
 	FORCEINLINE float GetAutoFireRate() const { return AutoFireRate; }
 	FORCEINLINE UParticleSystem* GetMuzzleFlash() const { return MuzzleFlash; }
 	FORCEINLINE USoundCue* GetFireSound() const { return FireSound; }
+	FORCEINLINE bool GetAutomatic() const { return bAutomatic; }
 	
 	/* Adds an impulse to the Weapon */
 	void ThrowWeapon();
