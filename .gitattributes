@@ -1755,3 +1755,4 @@ KiteDemo/* filter=lfs diff=lfs merge=lfs -text
 Content/KiteDemo/Environments/GroundTiles/RockyPath/*T_GDC_StonePath_Tile_N.uassets filter=lfs diff=lfs merge=lfs -text
 Content/KiteDemo/Environments/GroundTiles/RockyPath/T_GDC_StonePath_Tile_D_R.uassets filter=lfs diff=lfs merge=lfs -text
 Content/KiteDemo/Environments/GroundTiles/RockyPath/T_GDC_StonePath_Tile_N.uassets filter=lfs diff=lfs merge=lfs -text
+_Game/**/**/**/Test.uasset filter=lfs diff=lfs merge=lfs -text
