@@ -1751,3 +1751,4 @@ Content/Textures/T_WorkingClothes01_N.uasset filter=lfs diff=lfs merge=lfs -text
 Content/Textures/T_PaperBoxes_03_N.uasset filter=lfs diff=lfs merge=lfs -text
 Content/Textures/T_PlasticBoxes_BC.uasset filter=lfs diff=lfs merge=lfs -text
 Content/Textures/T_RecyclingMachine01_N.uasset filter=lfs diff=lfs merge=lfs -text
+KiteDemo/* filter=lfs diff=lfs merge=lfs -text
