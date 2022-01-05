@@ -1036,6 +1036,23 @@ void AShooterCharacter::HighlightInventorySlot()
 	HighlightedSlot = EmptySlot;
 }
 
+void AShooterCharacter::Footstep()
+{
+	FHitResult HitResult;
+	const FVector Start { GetActorLocation() };
+	const FVector End { Start + FVector::ZAxisVector *(-400.f) };
+	FCollisionQueryParams QueryParams;
+	QueryParams.bReturnPhysicalMaterial = true;
+
+	GetWorld()->LineTraceSingleByChannel(HitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility,
+		QueryParams);
+
+	UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+}
+
 void AShooterCharacter::UnHighlightInventorySlot()
 {
 	HighlightIconDelegate.Broadcast(HighlightedSlot, false);
