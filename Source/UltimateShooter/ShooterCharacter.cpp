@@ -6,6 +6,7 @@
 #include "Ammo.h"
 #include "DrawDebugHelpers.h"
 #include "Item.h"
+#include "UltimateShooter.h"
 #include "Weapon.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
@@ -17,6 +18,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Sound/SoundCue.h"
 
 // Sets default values
@@ -1050,7 +1052,12 @@ void AShooterCharacter::Footstep()
 		ECollisionChannel::ECC_Visibility,
 		QueryParams);
 
-	UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+	auto HitSurface = HitResult.PhysMaterial->SurfaceType;
+
+	if (HitSurface == EPS_Grass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Grass"));
+	}
 }
 
 void AShooterCharacter::UnHighlightInventorySlot()
