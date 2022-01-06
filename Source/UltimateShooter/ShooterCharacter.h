@@ -187,7 +187,7 @@ protected:
 	void HighlightInventorySlot();
 
 	UFUNCTION(BlueprintCallable)
-	void Footstep();
+	EPhysicalSurface GetPhysicalSurface();
 
 public:	
 	// Called every frame
