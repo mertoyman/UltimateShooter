@@ -1754,3 +1754,4 @@ Content/Textures/T_RecyclingMachine01_N.uasset filter=lfs diff=lfs merge=lfs -te
 Content/KiteDemo/Environments/GroundTiles/RockyPath/T_GDC_StonePath_Tile_N.uasset filter=lfs diff=lfs merge=lfs -text
 Content/KiteDemo/Environments/GroundTiles/RockyPath/T_GDC_StonePath_Tile_D_R.uasset filter=lfs diff=lfs merge=lfs -text
 Content/ParagonTwinblast/Characters/Global/Eyelash/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/ParagonTwinblast/Characters/Global/**/*.uasset filter=lfs diff=lfs merge=lfs -text
