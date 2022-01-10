@@ -81,7 +81,7 @@ protected:
 	/** Called when fire button is pressed */
 	void FireWeapon();
 
-	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
+	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FHitResult& OutBeamLocation);
 	
 	/* Set bAiming to true or false with button press*/
 	void AimingButtonPressed();

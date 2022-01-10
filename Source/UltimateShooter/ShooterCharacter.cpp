@@ -4,6 +4,7 @@
 #include "ShooterCharacter.h"
 
 #include "Ammo.h"
+#include "BulletHitInterface.h"
 #include "DrawDebugHelpers.h"
 #include "Item.h"
 #include "UltimateShooter.h"
@@ -561,8 +562,9 @@ void AShooterCharacter::FinishEquipping()
 	CombatState = ECombatState::ECS_Unoccupied;
 }
 
-bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation)
+bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FHitResult& OutHitResult)
 {
+	FVector OutBeamLocation;
 	// Check for crosshair trace hit
 	FHitResult CrosshairHitResult;
 	bool bCrosshairHit = TraceUnderCrosshairs(CrosshairHitResult, OutBeamLocation);
@@ -578,21 +580,20 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 	}
 
 	// Perform a second trace, this time from the gun barrel
-	FHitResult WeaponTraceHit;
 	const FVector WeaponTraceStart{MuzzleSocketLocation};
 	const FVector StartToEnd = OutBeamLocation - MuzzleSocketLocation;
 	const FVector WeaponTraceEnd{MuzzleSocketLocation + StartToEnd * 1.25f};
 
-	GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd,
+	GetWorld()->LineTraceSingleByChannel(OutHitResult, WeaponTraceStart, WeaponTraceEnd,
 	                                     ECollisionChannel::ECC_Visibility);
 
-	if (WeaponTraceHit.bBlockingHit) // Object between barrel and BeamEndPoint?
+	if (!OutHitResult.bBlockingHit) // Object between barrel and BeamEndPoint?
 	{
-		OutBeamLocation = WeaponTraceHit.Location;
-		return true;
+		OutHitResult.Location = OutBeamLocation;
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
@@ -671,15 +672,28 @@ void AShooterCharacter::SendBullet()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EquippedWeapon->GetMuzzleFlash(), SocketTransform);
 		}
 
-		FVector BeamEnd;
-		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
+		FHitResult BeamHitResult;
+		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamHitResult);
 		if (bBeamEnd)
 		{
-			// Spawn impact particles after updating BeamEndPoint
-			if (ImpactParticles)
+			// Does hit actor implement BulletHitInterface?
+			if (BeamHitResult.Actor.IsValid())
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEnd);
+				IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
+				if (BulletHitInterface)
+				{
+					BulletHitInterface->BulletHit_Implementation(BeamHitResult);
+				}
 			}
+			else
+			{
+				// Spawn default particles
+				if (ImpactParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamHitResult.Location);
+				}
+			}
+			
 		}
 
 		if (BeamParticles)
@@ -688,7 +702,7 @@ void AShooterCharacter::SendBullet()
 				GetWorld(), BeamParticles, SocketTransform);
 			if (Beam)
 			{
-				Beam->SetVectorParameter(FName("Target"), BeamEnd);
+				Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
 			}
 		}
 	}
