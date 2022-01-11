@@ -30,6 +30,8 @@ protected:
 	void Die();
 
 	void PlayHitMontage(FName Section, float PlayRate = 1.f);
+
+	void ResetHitReactTimer();
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
@@ -61,6 +63,19 @@ private:
 	/* Montage containing Hit and Death animations */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	UAnimMontage* HitMontage;
+
+	FTimerHandle HitReactTimer;
+
+	/* Min time of delay between hit reactions */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float HitReactDelayMin;
+
+	/* Max time of delay between hit reactions */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float HitReactDelayMax;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat, meta= (AllowPrivateAccess = true))
+	bool bCanHitReact;
 
 public:	
 	// Called every frame
