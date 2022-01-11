@@ -50,8 +50,8 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 	}
 }
 
-float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& damage_event, AController* event_instigator,
-	AActor* damage_causer)
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
 {
 	if (Health - DamageAmount <= 0.f)
 	{

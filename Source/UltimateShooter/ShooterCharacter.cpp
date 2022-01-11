@@ -689,8 +689,20 @@ void AShooterCharacter::SendBullet()
 				AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
 				if (HitEnemy)
 				{
+					float DamageAmount;
+					if (BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
+					{
+						//Head shot
+						DamageAmount = EquippedWeapon->GetHeadshotDamage();
+					}
+					else
+					{
+						// Body shot
+						DamageAmount = EquippedWeapon->GetDamage();
+					}
+
 					UGameplayStatics::ApplyDamage(BeamHitResult.Actor.Get(),
-						EquippedWeapon->GetDamage(),
+						DamageAmount,
 						GetController(),
 						this,
 						UDamageType::StaticClass()
