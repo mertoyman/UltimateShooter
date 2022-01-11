@@ -84,6 +84,12 @@ struct FWeaponDataTable: public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutomatic;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HeadShotDamage;
 };
 
 UCLASS()
@@ -212,6 +218,14 @@ private:
 	/* True for auto gunfire */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	bool bAutomatic;
+
+	/* Amount of damage caused by a bullet */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	float Damage;
+
+	/* Amount of damage when a bullet hits the head */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	float HeadShotDamage;
 	
 public:
 
@@ -228,6 +242,8 @@ public:
 	FORCEINLINE UParticleSystem* GetMuzzleFlash() const { return MuzzleFlash; }
 	FORCEINLINE USoundCue* GetFireSound() const { return FireSound; }
 	FORCEINLINE bool GetAutomatic() const { return bAutomatic; }
+	FORCEINLINE float GetDamage() const { return Damage; }
+	FORCEINLINE float GetHeadshotDamage() const { return HeadShotDamage; }
 	
 	/* Adds an impulse to the Weapon */
 	void ThrowWeapon();
