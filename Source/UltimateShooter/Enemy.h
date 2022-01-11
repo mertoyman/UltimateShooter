@@ -28,6 +28,8 @@ protected:
 	void HideHealthBar();
 
 	void Die();
+
+	void PlayHitMontage(FName Section, float PlayRate = 1.f);
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
@@ -55,6 +57,10 @@ private:
 	float HealthBarDisplayTime;
 	
 	FTimerHandle HealthBarTimer;
+
+	/* Montage containing Hit and Death animations */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UAnimMontage* HitMontage;
 
 public:	
 	// Called every frame

@@ -29,6 +29,17 @@ void AEnemy::Die()
 	HideHealthBar();
 }
 
+void AEnemy::PlayHitMontage(FName Section, float PlayRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(HitMontage, PlayRate);
+		AnimInstance->Montage_JumpToSection(Section, HitMontage);
+	}
+}
+
+
 void AEnemy::ShowHealthBar_Implementation()
 {
 	GetWorldTimerManager().ClearTimer(HealthBarTimer);
@@ -66,6 +77,7 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 	}
 
 	ShowHealthBar();
+	PlayHitMontage(FName("HitReactFront"));
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
