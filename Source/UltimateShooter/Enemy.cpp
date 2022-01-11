@@ -24,6 +24,11 @@ void AEnemy::BeginPlay()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
+void AEnemy::Die()
+{
+	HideHealthBar();
+}
+
 void AEnemy::ShowHealthBar_Implementation()
 {
 	GetWorldTimerManager().ClearTimer(HealthBarTimer);
@@ -69,6 +74,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	if (Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
+		Die();
 	}
 	else
 	{
