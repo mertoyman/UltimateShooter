@@ -32,6 +32,12 @@ protected:
 	void PlayHitMontage(FName Section, float PlayRate = 1.f);
 
 	void ResetHitReactTimer();
+
+	UFUNCTION(BlueprintCallable)
+	void StoreHitNumber(UUserWidget* HitNumber, FVector Location);
+
+	UFUNCTION()
+	void DestroyHitNumber(UUserWidget* HitNumber);
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
@@ -76,6 +82,14 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat, meta= (AllowPrivateAccess = true))
 	bool bCanHitReact;
+
+	/* Map to store  HitNumber widgets and their hit locations */
+	UPROPERTY(VisibleAnywhere, Category=Combat, meta= (AllowPrivateAccess = true))
+	TMap<UUserWidget*, FVector> HitNumbers;
+
+	/* Time before a HitNumber is removed from the screen */
+	UPROPERTY(EditAnywhere, Category=Combat, meta= (AllowPrivateAccess = true))
+	float HitNumberDestroyTime;
 
 public:	
 	// Called every frame
