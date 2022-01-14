@@ -38,6 +38,9 @@ protected:
 
 	UFUNCTION()
 	void DestroyHitNumber(UUserWidget* HitNumber);
+
+	void UpdateHitNumbers();
+	
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
