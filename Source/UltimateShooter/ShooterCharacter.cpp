@@ -705,8 +705,9 @@ void AShooterCharacter::SendBullet()
 						DamageAmount,
 						GetController(),
 						this,
-						UDamageType::StaticClass()
-						);
+						UDamageType::StaticClass());
+
+					HitEnemy->ShowHitNumber(DamageAmount, BeamHitResult.Location);
 				}
 			}
 			else

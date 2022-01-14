@@ -10,9 +10,9 @@ AEnemy::AEnemy() :
 	Health(100.f),
 	MaxHealth(100.f),
 	HealthBarDisplayTime(4.f),
-	bCanHitReact(true),
 	HitReactDelayMin(0.5f),
-	HitReactDelayMax(3.f)
+	HitReactDelayMax(3.f),
+	bCanHitReact(true)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
