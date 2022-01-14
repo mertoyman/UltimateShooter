@@ -818,8 +818,8 @@ void AShooterCharacter::StartCrosshairBulletFire()
 
 void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 {
-	FVector2D WalkSpeedRange{0.f, 600.f};
-	FVector2D VelocityMultiplierRange{0.f, 1.f};
+	const FVector2D WalkSpeedRange{0.f, 600.f};
+	const FVector2D VelocityMultiplierRange{0.f, 1.f};
 	FVector Velocity{GetVelocity()};
 	Velocity.Z = 0.f;
 
