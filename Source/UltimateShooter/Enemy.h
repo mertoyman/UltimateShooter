@@ -69,6 +69,9 @@ protected:
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable)
+	void PlayAttackMontage(FName Section, float PlayRate = 1.f);
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
@@ -155,6 +158,16 @@ private:
 	/* Overlap sphere for attack range */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta=(AllowPrivateAccess = true))
 	USphereComponent* CombatRangeSphere;
+
+	/* Montage containing different attack animations */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UAnimMontage* AttackMontage;
+
+	/* The four attack montage section names */
+	FName AttackLFast;
+	FName AttackRFast;
+	FName AttackL;
+	FName AttackR;
 
 public:	
 	// Called every frame

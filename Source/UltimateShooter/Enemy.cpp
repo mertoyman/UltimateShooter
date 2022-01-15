@@ -22,7 +22,11 @@ AEnemy::AEnemy() :
 	bCanHitReact(true),
 	HitNumberDestroyTime(1.5f),
 	bStunned(false),
-	StunChance(.5f)
+	StunChance(.5f),
+	AttackLFast(TEXT("AttackLFast")),
+	AttackRFast(TEXT("AttackRFast")),
+	AttackL(TEXT("AttackL")),
+	AttackR(TEXT("AttackR"))
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -196,6 +200,16 @@ void AEnemy::CombatRangeEndOverlap(
 		}
 	}
 	
+}
+
+void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		AnimInstance->Montage_JumpToSection(Section, AttackMontage);
+	}
 }
 
 void AEnemy::ShowHealthBar_Implementation()
