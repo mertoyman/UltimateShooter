@@ -20,7 +20,9 @@ AEnemy::AEnemy() :
 	HitReactDelayMin(0.5f),
 	HitReactDelayMax(3.f),
 	bCanHitReact(true),
-	HitNumberDestroyTime(1.5f)
+	HitNumberDestroyTime(1.5f),
+	bStunned(false),
+	StunChance(.5f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -181,7 +183,16 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 	}
 
 	ShowHealthBar();
-	PlayHitMontage(FName("HitReactFront"));
+
+	// Determine whether bullet hit stuns
+	const float Stunned = FMath::FRandRange(0.f, 1.f);
+	if (Stunned <= StunChance)
+	{
+		//Stun the enemy
+		PlayHitMontage(FName("HitReactFront"));
+		bStunned = true;
+	}
+	
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
