@@ -72,6 +72,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayAttackMontage(FName Section, float PlayRate = 1.f);
+
+	UFUNCTION(BlueprintPure)
+	FName GetAttackSectionName();
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
