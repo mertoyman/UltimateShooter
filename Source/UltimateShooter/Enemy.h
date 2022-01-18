@@ -91,6 +91,18 @@ protected:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateLeftWeapon();
+
+	UFUNCTION(BlueprintCallable)
+	void DeactivateLeftWeapon();
+	
+	UFUNCTION(BlueprintCallable)
+	void ActivateRightWeapon();
+
+	UFUNCTION(BlueprintCallable)
+	void DeactivateRightWeapon();
 	
 private:
 	/* Particle effect to spawn when bullet impacts */

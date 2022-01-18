@@ -282,6 +282,26 @@ void AEnemy::OnRightWeaponOverlap(
 {
 }
 
+void AEnemy::ActivateLeftWeapon()
+{
+	LeftWeaponCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AEnemy::DeactivateLeftWeapon()
+{
+	LeftWeaponCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemy::ActivateRightWeapon()
+{
+	RightWeaponCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AEnemy::DeactivateRightWeapon()
+{
+	RightWeaponCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void AEnemy::ShowHealthBar_Implementation()
 {
 	GetWorldTimerManager().ClearTimer(HealthBarTimer);
