@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BulletHitInterface.h"
+#include "ShooterCharacter.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "GameFramework/Character.h"
 #include "Sound/SoundCue.h"
@@ -76,7 +77,10 @@ protected:
 	UFUNCTION(BlueprintPure)
 	FName GetAttackSectionName();
 
-	void OnLeftWeaponOverlap(
+	void DoDamage(AActor* TargetActor);
+
+	UFUNCTION()
+	void LeftWeaponOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
@@ -84,7 +88,8 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
-	void OnRightWeaponOverlap(
+	UFUNCTION()
+	void RightWeaponOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
@@ -207,6 +212,10 @@ private:
 	/* Collision volume for the right weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	UBoxComponent* RightWeaponCollision;
+
+	/* Base damage for enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float BaseDamage;
 
 public:	
 	// Called every frame

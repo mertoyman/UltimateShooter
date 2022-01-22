@@ -28,7 +28,8 @@ AEnemy::AEnemy() :
 	AttackLFast(TEXT("AttackLFast")),
 	AttackRFast(TEXT("AttackRFast")),
 	AttackL(TEXT("AttackL")),
-	AttackR(TEXT("AttackR"))
+	AttackR(TEXT("AttackR")),
+	BaseDamage(20.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -59,8 +60,8 @@ void AEnemy::BeginPlay()
 	CombatRangeSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatRangeEndOverlap);
 
 	// Bind functions to overlap events for weapon boxes
-	LeftWeaponCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnLeftWeaponOverlap);
-	RightWeaponCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnRightWeaponOverlap);
+	LeftWeaponCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::LeftWeaponOverlap);
+	RightWeaponCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::RightWeaponOverlap);
 
 	// Set collision presets for weapon boxes
 	LeftWeaponCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -262,17 +263,24 @@ FName AEnemy::GetAttackSectionName()
 	return SectionName;
 }
 
-void AEnemy::OnLeftWeaponOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
+void AEnemy::DoDamage(AActor* Target)
 {
+	if (!Target) return;
+
+	auto Character = Cast<AShooterCharacter>(Target);
+	if (Character)
+	{
+		UGameplayStatics::ApplyDamage(
+		Character,
+		BaseDamage,
+		EnemyController,
+		this,
+		UDamageType::StaticClass()
+		);
+	}
 }
 
-void AEnemy::OnRightWeaponOverlap(
+void AEnemy::LeftWeaponOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
@@ -280,6 +288,18 @@ void AEnemy::OnRightWeaponOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	DoDamage(OtherActor);
+}
+
+void AEnemy::RightWeaponOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	DoDamage(OtherActor);
 }
 
 void AEnemy::ActivateLeftWeapon()

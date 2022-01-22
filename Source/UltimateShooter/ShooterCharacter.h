@@ -47,6 +47,9 @@ public:
 	// Sets default values for this character's properties
 	AShooterCharacter();
 
+	// Take combat damage
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -477,6 +480,14 @@ private:
 	/* The index for currently highlighted slot */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta= (AllowPrivateAccess = true))
 	int32 HighlightedSlot;
+
+	/* Character health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float Health;
+
+	/* Character max health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float MaxHealth;
 
 public:
 	/* Return CameraBoom subobject*/
