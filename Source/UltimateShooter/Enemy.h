@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "BulletHitInterface.h"
-#include "ShooterCharacter.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "GameFramework/Character.h"
 #include "Sound/SoundCue.h"
@@ -77,7 +76,8 @@ protected:
 	UFUNCTION(BlueprintPure)
 	FName GetAttackSectionName();
 
-	void DoDamage(AActor* TargetActor);
+	void DoDamage(class AShooterCharacter* TargetActor);
+	void SpawnBloodParticles(AShooterCharacter* Character, FName WeaponSocketName);
 
 	UFUNCTION()
 	void LeftWeaponOverlap(
@@ -216,6 +216,12 @@ private:
 	/* Base damage for enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	float BaseDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	FName LeftWeaponSocket;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	FName RightWeaponSocket;
 
 public:	
 	// Called every frame
