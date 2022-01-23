@@ -1116,6 +1116,14 @@ EPhysicalSurface AShooterCharacter::GetPhysicalSurface()
 	
 }
 
+void AShooterCharacter::PlayMeleeImpactSound()
+{
+	if (MeleeImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, MeleeImpactSound, GetActorLocation());
+	}
+}
+
 void AShooterCharacter::UnHighlightInventorySlot()
 {
 	HighlightIconDelegate.Broadcast(HighlightedSlot, false);

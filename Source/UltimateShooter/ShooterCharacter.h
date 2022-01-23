@@ -192,6 +192,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	EPhysicalSurface GetPhysicalSurface();
 
+	void PlayMeleeImpactSound();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -489,6 +491,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	float MaxHealth;
 
+	/* Sound made when character gets hit by a melee attack */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	USoundCue* MeleeImpactSound;
+
 public:
 	/* Return CameraBoom subobject*/
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -501,6 +507,7 @@ public:
 	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
 	FORCEINLINE bool GetShouldPlayPickupSound() const { return bShouldPlayPickupSound; }
 	FORCEINLINE bool GetShouldPlayEquipSound() const { return bShouldPlayEquipSound; }
+	FORCEINLINE USoundCue* GetMeleeImpactSound() const { return MeleeImpactSound; }
 	
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;

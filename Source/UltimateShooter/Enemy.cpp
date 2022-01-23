@@ -277,6 +277,11 @@ void AEnemy::DoDamage(AActor* Target)
 		this,
 		UDamageType::StaticClass()
 		);
+
+		if (Character->GetMeleeImpactSound())
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, Character->GetMeleeImpactSound(), GetActorLocation());
+		}
 	}
 }
 
