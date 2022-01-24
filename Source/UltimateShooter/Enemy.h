@@ -113,6 +113,9 @@ protected:
 
 	// Attempt to stun character
 	void StunCharacter(AShooterCharacter* Character);
+
+	void ResetCanAttack();
+	
 private:
 	/* Particle effect to spawn when bullet impacts */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
@@ -226,6 +229,16 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	FName RightWeaponSocket;
+
+	/* True when enemy can attack */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	bool bCanAttack;
+
+	FTimerHandle AttackWaitTimer;
+
+	/* Minimum wait time between attacks */ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float AttackWaitTime;
 
 public:	
 	// Called every frame

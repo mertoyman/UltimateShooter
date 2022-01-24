@@ -32,7 +32,9 @@ AEnemy::AEnemy() :
 	AttackR(TEXT("AttackR")),
 	BaseDamage(20.f),
 	LeftWeaponSocket(TEXT("FX_Trail_L_01")),
-	RightWeaponSocket(TEXT("FX_Trail_R_01"))
+	RightWeaponSocket(TEXT("FX_Trail_R_01")),
+	bCanAttack(true),
+	AttackWaitTime(2.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -85,6 +87,11 @@ void AEnemy::BeginPlay()
 
 	// Get the AI controller
 	EnemyController = Cast<AEnemyController>(GetController());
+
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool("CanAttack", true);
+	}
 	
 	const FVector WorldPatrolPoint = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint);
 	const FVector WorldPatrolPoint2 = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint2);
@@ -241,6 +248,23 @@ void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
 		AnimInstance->Montage_Play(AttackMontage);
 		AnimInstance->Montage_JumpToSection(Section, AttackMontage);
 	}
+
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(AttackWaitTimer, this, &AEnemy::ResetCanAttack, AttackWaitTime);
+
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(TEXT("CanAttack"), false);
+	}
+}
+
+void AEnemy::ResetCanAttack()
+{
+	bCanAttack = true;
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(TEXT("CanAttack"), true);
+	}
 }
 
 FName AEnemy::GetAttackSectionName()
@@ -265,6 +289,7 @@ FName AEnemy::GetAttackSectionName()
 
 	return SectionName;
 }
+
 
 void AEnemy::DoDamage(AShooterCharacter* Target)
 {
@@ -315,6 +340,7 @@ void AEnemy::StunCharacter(AShooterCharacter* Character)
 		}
 	}
 }
+
 
 void AEnemy::LeftWeaponOverlap(
 	UPrimitiveComponent* OverlappedComponent,
