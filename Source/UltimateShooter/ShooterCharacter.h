@@ -502,7 +502,14 @@ private:
 	/* Blood particle emiited when character gets hit by a melee attack */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	UParticleSystem* BloodParticles;
-	
+
+	/* Hit react anim montage for when character is stunned */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UAnimMontage* HitReactMontage;
+
+	/* Chance of being stunned when hit by enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float StunChance;
 
 public:
 	/* Return CameraBoom subobject*/
@@ -540,4 +547,8 @@ public:
 	void UnHighlightInventorySlot();
 
 	FORCEINLINE AWeapon* GetEquippedWeapon() const { return EquippedWeapon; }
+
+	void Stun();
+
+	FORCEINLINE float GetStunChance() const { return StunChance; }
 };

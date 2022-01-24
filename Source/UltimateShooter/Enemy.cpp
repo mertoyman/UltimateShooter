@@ -301,6 +301,21 @@ void AEnemy::SpawnBloodParticles(AShooterCharacter* Character, FName WeaponSocke
 	}
 }
 
+void AEnemy::StunCharacter(AShooterCharacter* Character)
+{
+	if (Character)
+	{
+		Character->SetCombatState(ECombatState::ECS_Stunned);
+
+		const float Stun { FMath::RandRange(0.f, 1.f) };
+
+		if (Stun <= Character->GetStunChance())
+		{
+			Character->Stun();
+		}
+	}
+}
+
 void AEnemy::LeftWeaponOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
@@ -314,7 +329,7 @@ void AEnemy::LeftWeaponOverlap(
 	{
 		SpawnBloodParticles(Character, LeftWeaponSocket);
 		DoDamage(Character);
-		Character->SetCombatState(ECombatState::ECS_Stunned);
+		StunCharacter(Character);
 	}
 }
 
@@ -331,7 +346,7 @@ void AEnemy::RightWeaponOverlap(
 	{
 		SpawnBloodParticles(Character, RightWeaponSocket);
 		DoDamage(Character);
-		Character->SetCombatState(ECombatState::ECS_Stunned);
+		StunCharacter(Character);
 	}
 }
 

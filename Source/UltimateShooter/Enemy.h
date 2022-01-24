@@ -76,8 +76,6 @@ protected:
 	UFUNCTION(BlueprintPure)
 	FName GetAttackSectionName();
 
-	void DoDamage(class AShooterCharacter* TargetActor);
-	void SpawnBloodParticles(AShooterCharacter* Character, FName WeaponSocketName);
 
 	UFUNCTION()
 	void LeftWeaponOverlap(
@@ -109,6 +107,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void DeactivateRightWeapon();
 	
+	void DoDamage(class AShooterCharacter* TargetActor);
+
+	void SpawnBloodParticles(AShooterCharacter* Character, FName WeaponSocketName);
+
+	// Attempt to stun character
+	void StunCharacter(AShooterCharacter* Character);
 private:
 	/* Particle effect to spawn when bullet impacts */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
