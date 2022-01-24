@@ -17,6 +17,7 @@ enum class ECombatState : uint8
 	ECS_FireTimerInProgress UMETA(DisplayName = "FireTimerInProgress"),
 	ECS_Reloading UMETA(DisplayName = "Reloading"),
 	ECS_Equipping UMETA(DisplayName = "Equipping"),
+	ECS_Stunned UMETA(DisplayName = "Stunned"),
 	
 	ECS_MAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -193,6 +194,9 @@ protected:
 	EPhysicalSurface GetPhysicalSurface();
 
 	void PlayMeleeImpactSound();
+
+	UFUNCTION(BlueprintCallable)
+	void EndStun();
 
 public:	
 	// Called every frame
@@ -508,6 +512,7 @@ public:
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
+	FORCEINLINE void SetCombatState(ECombatState State) { CombatState = State; } 
 	FORCEINLINE bool GetCrouching() const { return bCrouching; }
 	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
 	FORCEINLINE bool GetShouldPlayPickupSound() const { return bShouldPlayPickupSound; }

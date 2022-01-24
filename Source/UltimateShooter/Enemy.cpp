@@ -314,7 +314,7 @@ void AEnemy::LeftWeaponOverlap(
 	{
 		SpawnBloodParticles(Character, LeftWeaponSocket);
 		DoDamage(Character);
-
+		Character->SetCombatState(ECombatState::ECS_Stunned);
 	}
 }
 
@@ -331,7 +331,7 @@ void AEnemy::RightWeaponOverlap(
 	{
 		SpawnBloodParticles(Character, RightWeaponSocket);
 		DoDamage(Character);
-
+		Character->SetCombatState(ECombatState::ECS_Stunned);
 	}
 }
 
