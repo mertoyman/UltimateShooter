@@ -246,7 +246,7 @@ void AEnemy::CombatRangeOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if(!OtherActor) return;
+	if(!OtherActor ) return;
 	auto ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
 	if (ShooterCharacter)
 	{
