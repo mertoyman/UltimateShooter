@@ -117,6 +117,9 @@ protected:
 	void ResetCanAttack();
 	
 	void PlayDeathMontage(FName Section, float PlayRate = 1.f);
+
+	UFUNCTION(BlueprintCallable)
+	void FinishDeath();
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
@@ -245,6 +248,8 @@ private:
 	/* Montage containing different death animations */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	UAnimMontage* DeathMontage;
+
+	bool bDying;
 
 public:	
 	// Called every frame

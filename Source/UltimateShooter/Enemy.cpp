@@ -34,7 +34,8 @@ AEnemy::AEnemy() :
 	LeftWeaponSocket(TEXT("FX_Trail_L_01")),
 	RightWeaponSocket(TEXT("FX_Trail_R_01")),
 	bCanAttack(true),
-	AttackWaitTime(2.f)
+	AttackWaitTime(2.f),
+	bDying(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -109,6 +110,10 @@ void AEnemy::BeginPlay()
 
 void AEnemy::Die()
 {
+	if(bDying) return;
+
+	bDying = true;
+	
 	HideHealthBar();
 
 	PlayDeathMontage("DeathBack");
@@ -128,6 +133,11 @@ void AEnemy::PlayDeathMontage(FName Section, float PlayRate)
 		AnimInstance->Montage_Play(DeathMontage);
 		AnimInstance->Montage_JumpToSection(Section, DeathMontage);
 	}
+}
+
+void AEnemy::FinishDeath()
+{
+	Destroy();
 }
 
 void AEnemy::PlayHitMontage(FName Section, float PlayRate)
