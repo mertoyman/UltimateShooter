@@ -223,8 +223,11 @@ void AEnemy::AgroSphereOverlap(
 	auto Character = Cast<AShooterCharacter>(OtherActor);
 	if (Character)
 	{
-		// Set the value on the target blackboard key 
-		EnemyController->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Character);
+		if(EnemyController)
+		{
+			// Set the value on the target blackboard key 
+			EnemyController->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Character);
+		}
 	}
 }
 
