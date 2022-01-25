@@ -116,6 +116,8 @@ protected:
 
 	void ResetCanAttack();
 	
+	void PlayDeathMontage(FName Section, float PlayRate = 1.f);
+	
 private:
 	/* Particle effect to spawn when bullet impacts */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
@@ -239,6 +241,10 @@ private:
 	/* Minimum wait time between attacks */ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	float AttackWaitTime;
+
+	/* Montage containing different death animations */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UAnimMontage* DeathMontage;
 
 public:	
 	// Called every frame

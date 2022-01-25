@@ -110,6 +110,24 @@ void AEnemy::BeginPlay()
 void AEnemy::Die()
 {
 	HideHealthBar();
+
+	PlayDeathMontage("DeathBack");
+
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool("Dead", true);
+		EnemyController->StopMovement();
+	}
+}
+
+void AEnemy::PlayDeathMontage(FName Section, float PlayRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+		AnimInstance->Montage_JumpToSection(Section, DeathMontage);
+	}
 }
 
 void AEnemy::PlayHitMontage(FName Section, float PlayRate)
@@ -266,6 +284,7 @@ void AEnemy::ResetCanAttack()
 		EnemyController->GetBlackboardComponent()->SetValueAsBool(TEXT("CanAttack"), true);
 	}
 }
+
 
 FName AEnemy::GetAttackSectionName()
 {
