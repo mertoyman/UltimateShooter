@@ -109,6 +109,7 @@ protected:
 	void PlayFireSound();
 
 	void SendBullet();
+
 	void PlayHipFireMontage();
 
 	void StartFireTimer();
@@ -197,6 +198,14 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndStun();
+
+	void Die();
+
+	void PlayDeathMontage();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishDeath();
+
 
 public:	
 	// Called every frame
@@ -510,6 +519,10 @@ private:
 	/* Chance of being stunned when hit by enemy */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	float StunChance;
+
+	/* Montage containing different death animations */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	UAnimMontage* DeathMontage;
 
 public:
 	/* Return CameraBoom subobject*/
