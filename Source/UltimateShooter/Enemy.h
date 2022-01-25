@@ -120,6 +120,8 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void FinishDeath();
+
+	void DestroyEnemy();
 	
 private:
 	/* Particle effect to spawn when bullet impacts */
@@ -250,6 +252,12 @@ private:
 	UAnimMontage* DeathMontage;
 
 	bool bDying;
+
+	FTimerHandle DeathTimer;
+
+	/* Time after death */ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
+	float DeathTime;
 
 public:	
 	// Called every frame
