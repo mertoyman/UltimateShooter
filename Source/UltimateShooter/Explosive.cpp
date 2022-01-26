@@ -3,6 +3,8 @@
 
 #include "Explosive.h"
 
+#include "Components/SphereComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -10,6 +12,12 @@ AExplosive::AExplosive()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	ExplosiveMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Explosive Mesh"));
+	ExplosiveMesh->SetupAttachment(RootComponent);
+
+	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Overlap Sphere"));
+	OverlapSphere->SetupAttachment(RootComponent);
 
 }
 
@@ -40,6 +48,13 @@ void AExplosive::BulletHit_Implementation(FHitResult HitResult)
 	}
 
 	// TODO: Apply explosive damage
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors,  ACharacter::StaticClass());
+
+	for (auto Actor : OverlappingActors)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Actor damaged by explosive: %s"), *Actor->GetName());
+	}
 	Destroy();
 }
 
