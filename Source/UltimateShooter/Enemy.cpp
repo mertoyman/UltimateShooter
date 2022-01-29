@@ -463,7 +463,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AEnemy::BulletHit_Implementation(FHitResult HitResult)
+void AEnemy::BulletHit_Implementation(FHitResult HitResult, AActor* Shooter, AController* ShooterController)
 {
 	if (ImpactSound)
 	{
@@ -474,8 +474,32 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, HitResult.Location, FRotator{0.f}, true);
 	}
+	
+}
 
-	if(bDying) return;
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	// Set the target blackboard key to agro the character
+	if (EnemyController)
+	{
+		if(EnemyController->GetBlackboardComponent())
+		{
+			EnemyController->GetBlackboardComponent()->SetValueAsObject(FName("Target"), DamageCauser);
+		}
+	}
+	
+	if (Health - DamageAmount <= 0.f)
+	{
+		Health = 0.f;
+		Die();
+	}
+	else
+	{
+		Health -= DamageAmount;
+	}
+
+	if(bDying) return DamageAmount;
 
 	ShowHealthBar();
 
@@ -489,27 +513,6 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 		
 	}
 	
-}
-
-float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
-{
-	// Set the target blackboard key to agro the character
-	if (EnemyController)
-	{
-		EnemyController->GetBlackboardComponent()->SetValueAsObject(FName("Target"), DamageCauser);
-	}
-	
-	if (Health - DamageAmount <= 0.f)
-	{
-		Health = 0.f;
-		Die();
-	}
-	else
-	{
-		Health -= DamageAmount;
-	}
-
 	return DamageAmount;
 }
 
