@@ -1768,3 +1768,4 @@ Content/ParagonGrux/Characters/Maps/**/*.umap filter=lfs diff=lfs merge=lfs -tex
 Content/ParagonGrux/FX/**/*.uasset filter=lfs diff=lfs merge=lfs -text
 Content/ParagonKhaimera/**/*.uasset filter=lfs diff=lfs merge=lfs -text
 Content/ParagonKhaimera/**/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/ParagonProps/**/*.uasset filter=lfs diff=lfs merge=lfs -text
