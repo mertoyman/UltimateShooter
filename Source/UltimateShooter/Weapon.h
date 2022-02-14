@@ -119,11 +119,11 @@ private:
 	bool bFalling;
 
 	/* Ammo count for this weapon*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	int32 Ammo;
 
 	/* Maximum ammo that our weapon can carry */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	int32 MagazineCapacity;
 	
 	/* The type of the weapon*/
@@ -131,19 +131,19 @@ private:
 	EWeaponType WeaponType;
 
 	/* The type of the ammo for this weapon */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	EAmmoType AmmoType;
 
 	/* FName for the Reload Montage Section */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	FName ReloadMontageSection;
 
 	/* True when moving the clip while reloading */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	bool bMovingClip;
 
 	/* Name for the clip bone  */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	FName ClipBoneName;
 
 	/* Data table for weapon properties */
@@ -216,15 +216,15 @@ private:
 	float RecoilRotation;
 
 	/* True for auto gunfire */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	bool bAutomatic;
 
 	/* Amount of damage caused by a bullet */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	float Damage;
 
 	/* Amount of damage when a bullet hits the head */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Weapon Properties", meta=(AllowPrivateAccess=true))
 	float HeadShotDamage;
 	
 public:

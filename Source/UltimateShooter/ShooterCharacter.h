@@ -524,6 +524,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat, meta= (AllowPrivateAccess = true))
 	UAnimMontage* DeathMontage;
 
+	/* True when we die */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat, meta= (AllowPrivateAccess = true))
+	bool bDead;
+
 
 public:
 	/* Return CameraBoom subobject*/

@@ -7,7 +7,27 @@
 #include "AmmoType.h"
 #include "Ammo.generated.h"
 
+USTRUCT(BlueprintType)
+struct FAmmoDataTable : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* AmmoIcon;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundCue* PickupSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundCue* EquipSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMesh* AmmoMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString AmmoName;
+	
+};
 
 /**
  * 
@@ -24,6 +44,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	/* Override of SetItemProperties so we can set AmmoMesh properties */
 	virtual void SetItemProperties(EItemState State) override;
 
@@ -39,25 +61,43 @@ protected:
 
 	
 private:
-	/* Mesh for the ammo pickup */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Ammo, meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* AmmoMesh;
 
 	/* Ammo Type for the Ammo */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Ammo, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AmmoProperties, meta=(AllowPrivateAccess=true))
 	EAmmoType AmmoType;
 
-	/* The texture for the Ammo icon */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Ammo, meta=(AllowPrivateAccess=true))
-	UTexture2D* AmmoIconTexture;
+	/* Mesh for the ammo pickup */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category=AmmoProperties, meta=(AllowPrivateAccess=true))
+	UStaticMeshComponent* AmmoMesh;
 
 	/* Collision box for picking up the ammo when overlapped */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Ammo, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=AmmoProperties, meta=(AllowPrivateAccess=true))
 	class USphereComponent* AmmoCollisionSphere;
+	
+	/* The texture for the Ammo icon */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=DataTable, meta=(AllowPrivateAccess=true))
+	UTexture2D* AmmoIconTexture;
+
+	/* Pick up sound for the ammo type */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=DataTable, meta=(AllowPrivateAccess=true))
+	class USoundCue* AmmoPickupSound;
+
+	/* Equip sound for the ammo type */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=DataTable, meta=(AllowPrivateAccess=true))
+	USoundCue* AmmoEquipSound;
+
+	/* Name of the ammo item */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=DataTable, meta=(AllowPrivateAccess=true))
+	FString AmmoName;
+	
+	/* Data table for ammo properties */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=DataTable, meta=(AllowPrivateAccess=true))
+	UDataTable* AmmoDataTable;
 
 public:
 	FORCEINLINE UStaticMeshComponent* GetAmmoMesh() const { return AmmoMesh; }
 	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; }
+	FORCEINLINE UTexture2D* GetAmmoIcon() const { return AmmoIconTexture; }
 	
 	virtual void EnableCustomDepth() override;
 	virtual void DisableCustomDepth() override;

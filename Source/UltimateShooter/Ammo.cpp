@@ -23,6 +23,44 @@ AAmmo::AAmmo()
 	AmmoCollisionSphere->SetSphereRadius(50.f);
 }
 
+
+void AAmmo::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	// Load the data in the Item Rarity Data Table
+
+	//Path to the Item Rarity Data Table
+	const FString AmmoTablePath(TEXT("DataTable'/Game/_Game/DataTables/AmmoDataTable.AmmoDataTable'"));
+	UDataTable* AmmoTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *AmmoTablePath));
+
+	if (AmmoTableObject)
+	{
+		FAmmoDataTable* AmmoDataRow = nullptr;
+		switch (AmmoType)
+		{
+			case EAmmoType::EAT_9mm:
+				AmmoDataRow = AmmoTableObject->FindRow<FAmmoDataTable>("9mm", "");
+			break;
+
+			case EAmmoType::EAT_AR:
+				AmmoDataRow = AmmoTableObject->FindRow<FAmmoDataTable>("ARAmmo", "");
+			break;
+			
+			default: ;
+		}
+
+		if (AmmoDataRow)
+		{
+			AmmoIconTexture = AmmoDataRow->AmmoIcon;
+			AmmoPickupSound = AmmoDataRow->PickupSound;
+			AmmoEquipSound = AmmoDataRow->EquipSound;
+			AmmoMesh->SetStaticMesh(AmmoDataRow->AmmoMesh);
+			AmmoName = AmmoDataRow->AmmoName;
+		}
+	}
+}
+
 void AAmmo::BeginPlay()
 {
 	Super::BeginPlay();

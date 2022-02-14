@@ -86,7 +86,8 @@ AShooterCharacter::AShooterCharacter() :
 	HighlightedSlot(-1),
 	Health(100.f),
 	MaxHealth(100.f),
-	StunChance(.25f)
+	StunChance(.25f),
+	bDead(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -197,7 +198,7 @@ float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 		auto EnemyController = Cast<AEnemyController>(EventInstigator);
 		if (EnemyController)
 		{
-			EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CharacterDead"), true);
+			EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CharacterDead"), bDead);
 		}
 	}
 	else
@@ -210,6 +211,7 @@ float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 
 void AShooterCharacter::Die()
 {
+	bDead = true;
 	PlayDeathMontage();
 }
 
