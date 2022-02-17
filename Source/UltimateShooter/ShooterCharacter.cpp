@@ -982,6 +982,7 @@ void AShooterCharacter::ResetEquipSoundTimer()
 	GetWorldTimerManager().ClearTimer(PickupSoundTimer);
 }
 
+
 FInterpLocation AShooterCharacter::GetInterpLocation(int32 Index)
 {
 	if (Index <= InterpLocations.Num())
@@ -1161,6 +1162,21 @@ EPhysicalSurface AShooterCharacter::GetPhysicalSurface()
 
 	return UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
 	
+}
+
+void AShooterCharacter::SwitchLevel(FName LevelName)
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		const FString CurrentLevelString = GetWorld()->GetMapName();
+		const FName CurrentLevelName(*CurrentLevelString);
+		if (CurrentLevelName != LevelName)
+		{
+			UGameplayStatics::OpenLevel(World, LevelName);
+		}
+		
+	}
 }
 
 void AShooterCharacter::PlayMeleeImpactSound()

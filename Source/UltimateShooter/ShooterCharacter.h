@@ -569,4 +569,6 @@ public:
 	void Stun();
 
 	FORCEINLINE float GetStunChance() const { return StunChance; }
+
+	void SwitchLevel(FName LevelName);
 };
