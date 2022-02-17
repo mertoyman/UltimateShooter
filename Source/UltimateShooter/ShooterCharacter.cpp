@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "EnemyController.h"
+#include "FirstSaveGame.h"
 #include "Item.h"
 #include "UltimateShooter.h"
 #include "Weapon.h"
@@ -1176,6 +1177,35 @@ void AShooterCharacter::SwitchLevel(FName LevelName)
 			UGameplayStatics::OpenLevel(World, LevelName);
 		}
 		
+	}
+}
+
+void AShooterCharacter::SaveGame()
+{
+	UFirstSaveGame* SaveGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
+
+	SaveGameInstance->CharacterStats.Health = Health;
+	SaveGameInstance->CharacterStats.MaxHealth = MaxHealth;
+	SaveGameInstance->CharacterStats.Location = GetActorLocation();
+	SaveGameInstance->CharacterStats.Rotation = GetActorRotation();
+
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->PlayerName, SaveGameInstance->UserIndex);
+}
+
+void AShooterCharacter::LoadGame(bool SetPosition)
+{
+	UFirstSaveGame* LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
+
+	LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
+
+	Health = LoadGameInstance->CharacterStats.Health;
+	MaxHealth = LoadGameInstance->CharacterStats.MaxHealth;
+	
+	if (SetPosition)
+	{
+		SetActorLocation(LoadGameInstance->CharacterStats.Location);
+
+		SetActorRotation(LoadGameInstance->CharacterStats.Rotation);
 	}
 }
 
